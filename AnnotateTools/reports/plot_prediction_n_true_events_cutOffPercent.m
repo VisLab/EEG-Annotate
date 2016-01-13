@@ -35,6 +35,7 @@ function plot_prediction_n_true_events_cutOffPercent(scores, weights, position, 
 
     fH = figure(1); 
     set(fH, 'Position', [50, 310, 1580, 420]);
+	
     map = [1, 1, 1
           0.00, 0.85, 1.00     % light blue
           0, 0, 0];
