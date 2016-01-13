@@ -14,7 +14,7 @@ levelDerivedDirNew = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\Experiment X2 Traffic 
 derivedXMLFile = [levelDerivedDir filesep level2File];
 obj = levelDerivedStudy('parentStudyXmlFilePath', derivedXMLFile);
 
-%% Call the HP and ICA combination
+%% Call the ASR
 callbackAndParameters = {@cleanASR3, {'burstCriterion', 20}};    
 obj = obj.createLevelDerivedStudy(callbackAndParameters, ...
       'filterDescription', 'Use ASR to clean the data', ...
