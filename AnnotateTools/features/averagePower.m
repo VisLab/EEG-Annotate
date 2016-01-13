@@ -1,5 +1,5 @@
 %% extract feature: average power in a window
-%  (apply 8 sub-bands and 8 sub-windows)
+%  (apply sub-bands and sub-windows)
 %
 %  parameters:
 %   EEGin: EEG data (in EEGLAB structure)
@@ -13,7 +13,12 @@
 %   samples: [4096 x n], n is sample number
 %   labels: [n x 1] cell
 %
-function [sampleOut, labelOut] = extractFeature_averagePower(EEGin, subbands, filterOrder, windowLength, subLength, subStep)
+function features = averagePower(EEG, varargin)
+
+
+end
+
+function [sampleOut, labelOut] = averagePower(EEGin, subbands, filterOrder, windowLength, subLength, subStep)
 
     dataLength = size(EEGin.data, 2); 
     sRate = EEGin.srate;

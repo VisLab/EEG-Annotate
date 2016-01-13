@@ -11,4 +11,3 @@ an example: runBCIT_ESS_ASR_Cleaning.m
 - update path in the example script
 - run an example script (tested with MATLAB R2015a)
 
-# Warning when clean_rawdata is run with MATLAB R2015b
