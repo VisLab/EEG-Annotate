@@ -2,7 +2,7 @@
 %  (apply sub-bands and sub-windows)
 %
 %  parameters:
-%   EEGin: EEG data (in EEGLAB structure)
+%   EEG: EEG data (in EEGLAB structure)
 %   subbands: frequency ranges of each band
 %   filterOrder to define the width of transition bands
 %   windowLength: the length of a window (in second)
@@ -10,12 +10,50 @@
 %   subStep: the gap between sub-windows (in second)
 %
 %  output:
+%    features: structure
+% 
 %   samples: [4096 x n], n is sample number
 %   labels: [n x 1] cell
 %
 function features = averagePower(EEG, varargin)
-
-
+try
+%Setup the parameters and reporting for the call   
+    params = vargin2struct(varargin);  
+    subbands = [0 50]; % defatult 
+    if isfield(params, 'subbands')
+        subbands = params.subbandsn;
+    end
+    filterOrder = 500; % defatult 
+    if isfield(params, 'filterOrder')
+        filterOrder = params.subbandsn;
+    end
+    windowLength = 1.0; % defatult 
+    if isfield(params, 'windowLength')
+        windowLength = params.subbandsn;
+    end
+    subLength = 0.125; % defatult 
+    if isfield(params, 'subLength')
+        subLength = params.subbandsn;
+    end
+    subStep = 0.125; % defatult 
+    if isfield(params, 'subStep')
+        subStep = params.subbandsn;
+    end
+    
+    
+    
+    
+    
+    
+    
+    
+    
+catch mex
+    errorMessages.averagePower = ['failed average power: ' getReport(mex)];
+    errorMessages.status = 'unprocessed';
+    EEG.etc.averagePower.errors = errorMessages;
+    fprintf(2, '%s\n', errorMessages.averagePower);
+end
 end
 
 function [sampleOut, labelOut] = averagePower(EEGin, subbands, filterOrder, windowLength, subLength, subStep)
