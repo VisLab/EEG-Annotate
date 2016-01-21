@@ -5,12 +5,12 @@ level2DerivedFile = 'studyLevelDerived_description.xml';
 % level2DerivedDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\Experiment X6 Speed Control';
 % featureOutDir = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\Experiment X6 Speed Control';
 
-% level2DerivedDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\Experiment X2 Traffic Complexity';
-% featureOutDir = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\Experiment X2 Traffic Complexity';
+level2DerivedDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\Experiment X2 Traffic Complexity';
+featureOutDir = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\Experiment X2 Traffic Complexity';
 % level2DerivedDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\X4 Advanced Guard Duty';
 % featureOutDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\Experiment X6 Speed Control';
-level2DerivedDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\X1 Baseline RSVP';   % 256 channels
-featureOutDir = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\X1 Baseline RSVP';
+% level2DerivedDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\X1 Baseline RSVP';   % 256 channels
+% featureOutDir = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\X1 Baseline RSVP';
 
 
 
