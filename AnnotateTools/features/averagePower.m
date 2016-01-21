@@ -102,7 +102,7 @@ try
     % mask to exclude samples
     % 1) end of samples
     % 2) samples overlapped with boundary event
-    [data.mask.Index, data.mask.comments] = excludeMask(data, EEGintp);
+    [data.mask.index, data.mask.comments] = excludeMask(data, EEGintp);
     
 catch mex
     errorMessages.averagePower = ['failed average power: ' getReport(mex)];
@@ -112,6 +112,30 @@ catch mex
 end
 end
 
+% add comment to the comment list
+% if the cell has already same comment, skip it.
+function commentsNew = addComments(comments, index, comment)
+    
+    commentsNew = comments;
+    
+    for i=1:length(index)
+        if isempty(commentsNew{index(i)})
+            commentsNew{index(i)} = cellstr(comment);
+        else
+            bExist = false;
+            for j=1:length(commentsNew{index(i)})
+                if strcmp(commentsNew{index(i)}{j}, comment)
+                    bExist = true;
+                    break;
+                end
+            end
+            if bExist == false
+                commentsNew{index(i)} = [commentsNew{index(i)} cellstr(comment)];
+            end
+        end
+    end
+end
+
 function [index, comments] = excludeMask(data, EEG)
 
     sampleNumb = size(data.samples, 2);
@@ -119,10 +143,8 @@ function [index, comments] = excludeMask(data, EEG)
     index = zeros(1, sampleNumb);
     comments = cell(1, sampleNumb);    % comment explaining why the sample is excluded
     
-    for i=sampleNumb-6:sampleNumb
-        index(i) = 1;
-        comments{i} = [comments{i} 'not enough sub-windows'];
-    end
+    index(sampleNumb-6:sampleNumb) = 1;
+    comments = addComments(comments, sampleNumb-6:sampleNumb, 'not enough sub-windows');
     
     boundaryFlag = zeros(1, sampleNumb);
     for e=1:length(EEG.event)
@@ -135,7 +157,8 @@ function [index, comments] = excludeMask(data, EEG)
     
     % to exclude overlapped samples
     tempSampleIdx = find(boundaryFlag);
-    comments{tempSampleIdx} = 'boundary samples';
+    index(tempSampleIdx) = 1;
+    comments = addComments(comments, tempSampleIdx, 'boundary samples');
     
     excludeIdx = [];
     for offset = -7:7
@@ -146,8 +169,8 @@ function [index, comments] = excludeMask(data, EEG)
     excludeIdx(excludeIdx < 1) = [];
     excludeIdx(excludeIdx > sampleNumb) = [];
     
-    comments{excludeIdx} = 'overlapped with boundary';
-    index(excludeIdx == 1) = 1;
+    index(excludeIdx) = 1;
+    comments = addComments(comments, excludeIdx, 'overlapped with boundary');
 end
 
 function [sampleOut, labelOut, timeOut] = getSampleFeatures(EEGin, config)
