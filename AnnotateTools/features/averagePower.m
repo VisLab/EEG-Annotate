@@ -129,7 +129,7 @@ function [index, comments] = excludeMask(data, EEG)
         if strcmp(EEG.event(e).type, 'boundary')
             beginBoundary = EEG.event(e).latency;
             endBoundary = beginBoundary + EEG.event(e).duration;
-            boundaryFlag((beginBoundary <= data.times) && (data.times <= endBoundary)) = 1;
+            boundaryFlag((beginBoundary <= data.times) & (data.times <= endBoundary)) = 1;
         end
     end
     
