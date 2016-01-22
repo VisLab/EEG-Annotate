@@ -24,7 +24,6 @@ obj = levelDerivedStudy('levelDerivedXmlFilePath', derivedXMLFile);
 
 %% go over all files and apply a feature extraction function
 subbands = [0 4; 4 8; 8 12; 12 16; 16 20; 20 24; 24 28; 28 32];
-filterOrder = 844;
 windowLength = 1.0;
 subWindowLength = 0.125;
 step = 0.125;
@@ -33,9 +32,8 @@ headsetName = 'biosemi64.sfp';
 for i=1:length(filenames)
     [path, name, ext] = fileparts(filenames{i});
     EEG = pop_loadset([name ext], path);
-	[data, config] = averagePower(EEG, ...
+	[data, config, history] = averagePower(EEG, ...
                             'subbands', subbands, ...
-                            'filterOrder', filterOrder, ...
                             'windowLength', windowLength, ...
                             'subWindowLength', subWindowLength, ...
                             'step', step, ...
@@ -46,7 +44,7 @@ for i=1:length(filenames)
     if ~isdir(outDir)   % if the directory is not exist
         mkdir(outDir);  % make the new directory
     end
-    save([outDir filesep saveFile], 'data', 'config', '-v7.3');
+    save([outDir filesep saveFile], 'data', 'config', 'history', '-v7.3');
 end;
 
  

@@ -26,17 +26,13 @@
 %      subLength
 %      step
 %
-function [data, config] = averagePower(EEG, varargin)
+function [data, config, history] = averagePower(EEG, varargin)
 try
     %Setup the parameters and reporting for the call   
     params = vargin2struct(varargin);  
     config.subbands = [0 50]; % defatult
     if isfield(params, 'subbands')
         config.subbands = params.subbands;
-    end
-    config.filterOrder = 500; % defatult 
-    if isfield(params, 'filterOrder')
-        config.filterOrder = params.filterOrder;
     end
     config.windowLength = 1.0; % defatult 
     if isfield(params, 'windowLength')
@@ -65,13 +61,23 @@ try
     ch_externals = find(exFlag==1);
     EEGonly = pop_select(EEG, 'nochannel', ch_externals);    % exclude external channels
 
+    % fill the feature fields: name, sampling rate
+    data.name = EEGonly.filename;
+    data.srate = EEGonly.srate;
+    
     % We assume three types of headsets
     % 1) biosemi 64 channel headset
     % 2) 256 channel headset which has 64 overlapped channels
     % 3) lower density channels
     % If no assumptions on the headsets, we need to interpolate all datasets.
-    if ~isempty(config.headset)
+    if isempty(config.headset)
+        data.chanlocs = EEGonly.chanlocs;       % original channel location 
+    else
         newchanlocs = readlocs(config.headset);
+        
+        data.chanlocs = newchanlocs;            % new channel location
+        data.urchanlocs = EEGonly.chanlocs;     % original channel location
+        
         if length(newchanlocs) == length(EEGonly.chanlocs)   % same biosemi 64 channel headset
             [newCh, originalCh] = getCommonChannel(newchanlocs, EEGonly.chanlocs);
             if isequal(newCh, originalCh)  % if two headsets are same
@@ -91,18 +97,14 @@ try
         end
     end
     
-    % fill the feature etc fields
-    data.name = EEGintp.filename;
-    data.channels = EEGintp.nbchan;
-
     % fill the feature samples, labels, and times field
     % features = accumulated data of (bandPass filtered average power) 
-    [data.samples,  data.labels, data.times] = getSampleFeatures(EEGintp, config);
+    [data.samples,  data.labels, data.times, history.subbands] = getSampleFeatures(EEGintp, config);
 
     % mask to exclude samples
     % 1) end of samples
     % 2) samples overlapped with boundary event
-    [data.mask.index, data.mask.comments] = excludeMask(data, EEGintp);
+    data.mask = excludeMask(data, EEGintp);
     
 catch mex
     errorMessages.averagePower = ['failed average power: ' getReport(mex)];
@@ -112,68 +114,42 @@ catch mex
 end
 end
 
-% add comment to the comment list
-% if the cell has already same comment, skip it.
-function commentsNew = addComments(comments, index, comment)
-    
-    commentsNew = comments;
-    
-    for i=1:length(index)
-        if isempty(commentsNew{index(i)})
-            commentsNew{index(i)} = cellstr(comment);
-        else
-            bExist = false;
-            for j=1:length(commentsNew{index(i)})
-                if strcmp(commentsNew{index(i)}{j}, comment)
-                    bExist = true;
-                    break;
-                end
-            end
-            if bExist == false
-                commentsNew{index(i)} = [commentsNew{index(i)} cellstr(comment)];
-            end
-        end
-    end
-end
-
-function [index, comments] = excludeMask(data, EEG)
+function mask = excludeMask(data, EEG)
 
     sampleNumb = size(data.samples, 2);
 
-    index = zeros(1, sampleNumb);
-    comments = cell(1, sampleNumb);    % comment explaining why the sample is excluded
+    mask.indexInBoundary = zeros(1, sampleNumb);
+    mask.indexOverlapBoundary = zeros(1, sampleNumb);
     
-    index(sampleNumb-6:sampleNumb) = 1;
-    comments = addComments(comments, sampleNumb-6:sampleNumb, 'not enough sub-windows');
+    mask.indexInBoundary(end-6:end) = 1; % end of samples. not enough sub-windows for one sample
     
+    % event.latency in frames
+    % data.times in milliseconds
     boundaryFlag = zeros(1, sampleNumb);
     for e=1:length(EEG.event)
         if strcmp(EEG.event(e).type, 'boundary')
-            beginBoundary = EEG.event(e).latency;
-            endBoundary = beginBoundary + EEG.event(e).duration;
+            beginBoundary = EEG.event(e).latency * 1000 / EEG.srate; % begin of boundary in milliseconds
+            endBoundary = beginBoundary + (EEG.event(e).duration * 1000 / EEG.srate); % end of boundary in milliseconds
             boundaryFlag((beginBoundary <= data.times) & (data.times <= endBoundary)) = 1;
         end
     end
+   
+    mask.indexInBoundary(boundaryFlag==1) = 1;  % in boundary samples
     
     % to exclude overlapped samples
-    tempSampleIdx = find(boundaryFlag);
-    index(tempSampleIdx) = 1;
-    comments = addComments(comments, tempSampleIdx, 'boundary samples');
-    
-    excludeIdx = [];
+    overlapIdx = [];
     for offset = -7:7
-        excludeIdx = cat(2, excludeIdx, tempSampleIdx+offset);
+        overlapIdx = cat(2, overlapIdx, mask.indexInBoundary+offset);
     end
     
-    excludeIdx = unique(excludeIdx(:));
-    excludeIdx(excludeIdx < 1) = [];
-    excludeIdx(excludeIdx > sampleNumb) = [];
+    overlapIdx = unique(overlapIdx(:));
+    overlapIdx(overlapIdx < 1) = [];
+    overlapIdx(overlapIdx > sampleNumb) = [];
     
-    index(excludeIdx) = 1;
-    comments = addComments(comments, excludeIdx, 'overlapped with boundary');
+    mask.indexOverlapBoundary(overlapIdx) = 1;  % overlapped with boundary
 end
 
-function [sampleOut, labelOut, timeOut] = getSampleFeatures(EEGin, config)
+function [sampleOut, labelOut, timeOut, historySubbands] = getSampleFeatures(EEGin, config)
 
     dataLength = size(EEGin.data, 2); 
     sRate = EEGin.srate;
@@ -183,8 +159,13 @@ function [sampleOut, labelOut, timeOut] = getSampleFeatures(EEGin, config)
 
     featureSubj = [];
     
+    historySubbands = struct('commands', [], 'filterOrder', []);
+    
     for m=1:size(config.subbands, 1) % for each sub-band
-        subEEG = pop_eegfiltnew(EEGin, config.subbands(m, 1), config.subbands(m, 2), config.filterOrder); 
+        %subEEG = pop_eegfiltnew(EEGin, config.subbands(m, 1), config.subbands(m, 2), config.filterOrder); 
+        [subEEG, com, b] = pop_eegfiltnew(EEGin, config.subbands(m, 1), config.subbands(m, 2)); 
+        historySubbands(m).commands = com;
+        historySubbands(m).filterOrder = length(b)-1;
         
         data = subEEG.data;    % amplitude data
         % z-normalize so that it has zero-mean and unit std.
@@ -195,7 +176,7 @@ function [sampleOut, labelOut, timeOut] = getSampleFeatures(EEGin, config)
         featureBand = [];
         windBegin = 1;
         windEnd = windBegin + subLengthFrame - 1;
-        while windEnd < dataLength
+        while windEnd <= dataLength     % update to include the last frame
             windFeature = mean(data(:, windBegin:windEnd), 2); % [64x1]
             featureBand = cat(2, featureBand, windFeature);
             windBegin = windBegin + stepFrame;
@@ -231,10 +212,7 @@ function [sampleOut, labelOut, timeOut] = getSampleFeatures(EEGin, config)
         end
     end
     
-    timeOut = (0:stepFrame:dataLength-1) ./ sRate;  % a vector of the starting time (in seconds)
-    
-%     sampleOut = samples(:, 1:end-7);
-%     labelOut = labels(1:end-7);
+    timeOut = EEGin.times(1:subLengthFrame:end);  % a vector of the starting time (in milliseconds)
 end
 
 function label = getEventLabelInString(event)
