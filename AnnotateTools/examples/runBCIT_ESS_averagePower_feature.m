@@ -5,8 +5,8 @@ level2DerivedFile = 'studyLevelDerived_description.xml';
 prefixIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\';
 prefixOut = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\';
 
-testName = 'Experiment X2 Traffic Complexity'; % 64 channels;
-% testName = 'Experiment X6 Speed Control'; 
+% testName = 'Experiment X2 Traffic Complexity'; % 64 channels;
+testName = 'Experiment X6 Speed Control'; 
 % testName = 'Experiment XC Calibration Driving'; 
 % testName = 'X1 Baseline RSVP'; % 256 channels;
 % testName = 'X2 RSVP Expertise'; 
@@ -16,10 +16,11 @@ testName = 'Experiment X2 Traffic Complexity'; % 64 channels;
 level2DerivedDir = [prefixIn testName];
 featureOutDir = [prefixOut testName]; 
 
+tic
+
 %% Create a level 2 derevied study
 derivedXMLFile = [level2DerivedDir filesep level2DerivedFile];
 obj = levelDerivedStudy('levelDerivedXmlFilePath', derivedXMLFile);
-%obj.validate();     % do I need to validate it? Kyung
 
 %% Get the file (.set) list
 [filenames, dataRecordingUuids, taskLabels, sessionNumbers, subjects] = getFilename(obj);
@@ -49,4 +50,4 @@ for i=1:length(filenames)
     save([outDir filesep saveFile], 'data', 'config', 'history', '-v7.3');
 end;
 
- 
+toc

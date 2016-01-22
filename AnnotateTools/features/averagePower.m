@@ -104,7 +104,7 @@ try
     % mask to exclude samples
     % 1) end of samples
     % 2) samples overlapped with boundary event
-    data.mask = excludeMask(data, EEGintp);
+    data.mask = excludeMask(data, EEGintp, config);
     
 catch mex
     errorMessages.averagePower = ['failed average power: ' getReport(mex)];
@@ -114,34 +114,37 @@ catch mex
 end
 end
 
-function mask = excludeMask(data, EEG)
+function mask = excludeMask(data, EEG, config)
 
     sampleNumb = size(data.samples, 2);
 
-    mask.indexInBoundary = zeros(1, sampleNumb);
+    mask.indexWithinBoundary = zeros(1, sampleNumb);
     mask.indexOverlapBoundary = zeros(1, sampleNumb);
     
-    mask.indexInBoundary(end-6:end) = 1; % end of samples. not enough sub-windows for one sample
+    mask.indexWithinBoundary(end-6:end) = 1; % end of samples. not enough sub-windows for one sample
     
     % event.latency in frames
     % data.times in milliseconds
     boundaryFlag = zeros(1, sampleNumb);
     for e=1:length(EEG.event)
         if strcmp(EEG.event(e).type, 'boundary')
-            beginBoundary = EEG.event(e).latency * 1000 / EEG.srate; % begin of boundary in milliseconds
-            endBoundary = beginBoundary + (EEG.event(e).duration * 1000 / EEG.srate); % end of boundary in milliseconds
+            beginBoundary = (EEG.event(e).latency / EEG.srate - config.step) * 1000; % begin of boundary in milliseconds
+            % to include the window of the boundary event, subtract one step. otherwise, the first sample in boundary is not flagged.
+            % data.times is the starting time of each window.
+            % if data.times is larger than the beginBoundary, it is excluded.
+            endBoundary = (EEG.event(e).latency + EEG.event(e).duration) / EEG.srate * 1000; % end of boundary in milliseconds
             boundaryFlag((beginBoundary <= data.times) & (data.times <= endBoundary)) = 1;
         end
     end
-   
-    mask.indexInBoundary(boundaryFlag==1) = 1;  % in boundary samples
+    
+    boundaryIdx = find(boundaryFlag);
+    mask.indexWithinBoundary(boundaryIdx) = 1;  % samples in boundary periods
     
     % to exclude overlapped samples
     overlapIdx = [];
     for offset = -7:7
-        overlapIdx = cat(2, overlapIdx, mask.indexInBoundary+offset);
+        overlapIdx = cat(2, overlapIdx, boundaryIdx+offset);
     end
-    
     overlapIdx = unique(overlapIdx(:));
     overlapIdx(overlapIdx < 1) = [];
     overlapIdx(overlapIdx > sampleNumb) = [];
