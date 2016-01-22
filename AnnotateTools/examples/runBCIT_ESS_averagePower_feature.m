@@ -2,17 +2,19 @@
 % 
 level2DerivedFile = 'studyLevelDerived_description.xml';
 
-% level2DerivedDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\Experiment X6 Speed Control';
-% featureOutDir = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\Experiment X6 Speed Control';
+prefixIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\';
+prefixOut = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\';
 
-level2DerivedDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\Experiment X2 Traffic Complexity';
-featureOutDir = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\Experiment X2 Traffic Complexity';
-% level2DerivedDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\X4 Advanced Guard Duty';
-% featureOutDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\Experiment X6 Speed Control';
-% level2DerivedDir = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\X1 Baseline RSVP';   % 256 channels
-% featureOutDir = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\X1 Baseline RSVP';
+testName = 'Experiment X2 Traffic Complexity'; % 64 channels;
+% testName = 'Experiment X6 Speed Control'; 
+% testName = 'Experiment XC Calibration Driving'; 
+% testName = 'X1 Baseline RSVP'; % 256 channels;
+% testName = 'X2 RSVP Expertise'; 
+% testName = 'X3 Baseline Guard Duty'; 
+% testName = 'X4 Advanced Guard Duty'; 
 
-
+level2DerivedDir = [prefixIn testName];
+featureOutDir = [prefixOut testName]; 
 
 %% Create a level 2 derevied study
 derivedXMLFile = [level2DerivedDir filesep level2DerivedFile];
