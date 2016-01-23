@@ -6,8 +6,8 @@ prefixIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\';
 prefixOut = 'D:\Temp\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\';
 
 % testName = 'Experiment X2 Traffic Complexity'; % 64 channels;
-testName = 'Experiment X6 Speed Control'; 
-% testName = 'Experiment XC Calibration Driving'; 
+% testName = 'Experiment X6 Speed Control'; 
+testName = 'Experiment XC Calibration Driving'; 
 % testName = 'X1 Baseline RSVP'; % 256 channels;
 % testName = 'X2 RSVP Expertise'; 
 % testName = 'X3 Baseline Guard Duty'; 
@@ -15,8 +15,6 @@ testName = 'Experiment X6 Speed Control';
 
 level2DerivedDir = [prefixIn testName];
 featureOutDir = [prefixOut testName]; 
-
-tic
 
 %% Create a level 2 derevied study
 derivedXMLFile = [level2DerivedDir filesep level2DerivedFile];
@@ -49,5 +47,3 @@ for i=1:length(filenames)
     end
     save([outDir filesep saveFile], 'data', 'config', 'history', '-v7.3');
 end;
-
-toc
