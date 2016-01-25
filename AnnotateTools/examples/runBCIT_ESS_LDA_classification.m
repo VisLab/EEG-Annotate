@@ -33,6 +33,7 @@ obj = levelDerivedStudy('levelDerivedXmlFilePath', derivedXMLFile);
 
 %%  classification parameter
 targetClass = '35';
+% LDA option
 LDAparam1 = 'linear';
 LDAparam2 = 'empirical'; % 'empirical' | 'uniform'
 
@@ -62,7 +63,7 @@ for trainSubjID = 1:18
 
         [testSamplePool, testLabelOriginal, excludeIdx] = getTestData([featureIn testName filesep 'session' filesep sessionNumbers{testSubjID}], ['averagePower_' name '.mat']);
         
-        if (testSubjID == 1) 
+        if (trainSubjID == 1)  % do only one time
             results.trueLabelOriginal{testSubjID} = testLabelOriginal;
             results.excludeIdx{testSubjID} = excludeIdx;
         end
@@ -82,4 +83,4 @@ end
 if ~isdir(scoreOut)   % if the directory is not exist
 	mkdir(scoreOut);  % make the new directory
 end
-save([scoreOut filesep testName '_LDAscore.mat'], 'results', '-v7.3');
+save([scoreOut filesep testName '_LDA.mat'], 'results', '-v7.3');
