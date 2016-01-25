@@ -15,5 +15,5 @@ Tools for annotating continuous EEG signals
  
  2) runBCIT_ESS_averagePower_feature.m : extracting feature (average power)
  
- 3) runBCIT_ESS_LDA_classification.m : estimating scores of test samples (using LDA classifier)
+ 3) runBCIT_ESS_X_classification.m : estimating scores of test samples (using X classifier)
 
