@@ -2,7 +2,7 @@
 %
 % The non-target samples do not overlap with the target samples.
 % 
-function [samples, labels] = getTrainingData2(dataPath, fileName, targetClass)
+function [samples, labels] = getTrainingData(dataPath, fileName, targetClass)
     
     load([dataPath filesep fileName]);
     

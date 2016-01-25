@@ -38,7 +38,7 @@ LDAparam2 = 'empirical'; % 'empirical' | 'uniform'
 
 %% save all scores into one file
 testsetNumb = length(filenames); 	% number of test dataset
-results = struct('trueLabelOriginal', [], 'excludeIdx', [], 'predLabelBinary', [], 'scoreStandard', [], 'scoreOriginal', []);
+results = struct('trueLabelBinary', [], 'trueLabelOriginal', [], 'predLabelBinary', [], 'scoreStandard', [], 'scoreOriginal', []);
 results.trueLabelOriginal = cell(1, testsetNumb);
 results.excludeIdx = cell(1, testsetNumb);
 results.predLabelBinary = cell(18, testsetNumb);
