@@ -69,7 +69,6 @@ for trainSubjID = 1:18
             results.excludeIdx{testSubjID} = excludeIdx;
         end
         
-        %% test label pool????
         testLabeltemp = zeros(size(testSamplePool, 2), 1);    % for temporary, use all zero labels.
         
         % ARRLS calculates scores for each labels. If there are five labels, it will calculates 5 scores.
