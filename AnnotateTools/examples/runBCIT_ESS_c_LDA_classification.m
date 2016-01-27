@@ -12,14 +12,14 @@ fileListIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\';	% to get the list of test f
 featureIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\';
 scoreOut = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_score\';
 
-testName = 'Experiment X2 Traffic Complexity'; % 64 channels;
+% testName = 'Experiment X2 Traffic Complexity'; % 64 channels;
 % testName = 'Experiment X6 Speed Control'; 
 % testName = 'Experiment XB Baseline Driving'; 
 % testName = 'Experiment XC Calibration Driving'; 
 % testName = 'X1 Baseline RSVP'; % 256 channels;
 % testName = 'X2 RSVP Expertise'; 
 % testName = 'X3 Baseline Guard Duty'; 
-% testName = 'X4 Advanced Guard Duty'; 
+testName = 'X4 Advanced Guard Duty'; 
 
 fileListDir = [fileListIn testName]; 
 featureDir = [featureIn testName]; 
