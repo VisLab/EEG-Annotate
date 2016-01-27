@@ -1,86 +1,79 @@
-%% Estimate scores of test samples using a classifer
+%% annotate samples 
 % 
-%  Assumption: VEP training set of (18 subjects odd-test)
+%  - do mask scores and zero-out scores
+%  - use the fixed weight vectors
+%  - assume VEP training dataset ==> 18 training sets
 %
 
-trainInPath = 'Z:\Data 2\Kyung\autoLabeling\data\AveragePower\zeroMean_unitStd\non_time_locked'; % path to VEP data set (extracted feature)
+% weights 
+position = 8;
+weights = [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5];
 
-%% set path to test set
-level2DerivedFile = 'studyLevelDerived_description.xml';
+classifierName = 'LDA'; % 'ARRLS'
 
-fileListIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR\';	% to get the list of test files
-featureIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_feature\averagePower\';
-scoreOut = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_score\';
+%% path to raw scores (estimated by classifiers)
+scoreIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_score\';	% path to estimated scores
+annotationOut = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_annotate\';    % save results
 
-% testName = 'Experiment X2 Traffic Complexity'; % 64 channels;
-% testName = 'Experiment X6 Speed Control'; 
-% testName = 'Experiment XB Baseline Driving'; 
-% testName = 'Experiment XC Calibration Driving'; 
-% testName = 'X1 Baseline RSVP'; % 256 channels;
-% testName = 'X2 RSVP Expertise'; 
-% testName = 'X3 Baseline Guard Duty'; 
-testName = 'X4 Advanced Guard Duty'; 
+% testNames = {'X3 Baseline Guard Duty'; ...
+%             'X4 Advanced Guard Duty'; ...
+%             'Experiment X2 Traffic Complexity'; ...
+%             'Experiment X6 Speed Control'; ...
+%             'Experiment XB Baseline Driving'; 
+%             'Experiment XC Calibration Driving'; ...
+%             'X1 Baseline RSVP'; ...
+%             'X2 RSVP Expertise'};
+testNames = {'X3 Baseline Guard Duty'; ...
+            'X4 Advanced Guard Duty'; ...
+            'Experiment X2 Traffic Complexity'; ...
+            'Experiment X6 Speed Control'};
 
-fileListDir = [fileListIn testName]; 
-featureDir = [featureIn testName]; 
-scoreOutDir = [scoreOut testName]; 
-
-%% Create a level 2 derevied study
-%  To get the list of file names
-derivedXMLFile = [fileListDir filesep level2DerivedFile];
-obj = levelDerivedStudy('levelDerivedXmlFilePath', derivedXMLFile);
-[filenames, dataRecordingUuids, taskLabels, sessionNumbers, subjects] = getFilename(obj);
-
-%%  classification parameter
-targetClass = '35';
-% LDA option
-LDAparam1 = 'linear';
-LDAparam2 = 'empirical'; % 'empirical' | 'uniform'
-
-%% save all scores into one file
-testsetNumb = length(filenames); 	% number of test dataset
-results = struct('trueLabelOriginal', [], 'excludeIdx', [], 'predLabelBinary', [], 'scoreStandard', [], 'scoreOriginal', []);
-results.trueLabelOriginal = cell(1, testsetNumb);
-results.excludeIdx = cell(1, testsetNumb);
-results.predLabelBinary = cell(18, testsetNumb);
-results.scoreStandard = cell(18, testsetNumb);
-results.scoreOriginal = cell(18, testsetNumb);
-
-%% go over all test files and estimate scores
-% In case of LDA, training loop is outer loop to avoid repeating of training classifiers.
-% In case of ARRLS, the loop reading larger dataset is outer loop to reduce the reading overhead.
-for trainSubjID = 1:18
-    trainFileName = ['B_' num2str(trainSubjID, '%02d') '.mat'];
-    [trainSamplePool, trainLabelPool] = getTrainingData(trainInPath, trainFileName, targetClass);
-    
-    % balance training samples 
-    [trainSample, trainLabel] = balanceOverMinor(trainSamplePool, trainLabelPool);
-    
-    ldaObj = fitcdiscr(trainSample', trainLabel, 'DiscrimType', LDAparam1, 'Prior', LDAparam2);
-
-	for testSubjID=1:testsetNumb
-		[path, name, ext] = fileparts(filenames{testSubjID});
-
-        [testSamplePool, testLabelOriginal, excludeIdx] = getTestData([featureIn testName filesep 'session' filesep sessionNumbers{testSubjID}], ['averagePower_' name '.mat']);
+if ~isdir(annotationOut)   % if the directory is not exist
+    mkdir(annotationOut);  % make the new directory
+end
         
-        if (trainSubjID == 1)  % do only one time
-            results.trueLabelOriginal{testSubjID} = testLabelOriginal;
-            results.excludeIdx{testSubjID} = excludeIdx;
+for t=1:length(testNames)
+    testName = testNames{t};
+    
+    load([scoreIn testName '_' classifierName '.mat']);  % load results
+
+    %     results = struct('trueLabelOriginal', [], 'excludeIdx', [], 'predLabelBinary', [], 'scoreStandard', [], 'scoreOriginal', []);
+    %     results.trueLabelOriginal = cell(1, testsetNumb);
+    %     results.excludeIdx = cell(1, testsetNumb);
+    %     results.predLabelBinary = cell(18, testsetNumb);
+    %     results.scoreStandard = cell(18, testsetNumb);
+    %     results.scoreOriginal = cell(18, testsetNumb);
+
+    %% go over all test sets and estimate scores
+    testsetNumb = length(results.trueLabelOriginal);
+
+    annotation = struct('trueLabel', [], 'excludeIdx', [], 'aScore', []);  
+    % aScore: annotation score. note that it has the same length to true labels    
+    
+    annotation.trueLabel = cell(1, testsetNumb);
+    annotation.excludeIdx = cell(1, testsetNumb);
+    annotation.aScore = cell(18, testsetNumb);
+    
+    for testSubjID=1:testsetNumb
+        annotation.trueLabel{testSubjID} = results.trueLabelOriginal{testSubjID};
+        annotation.excludeIdx{testSubjID} = results.excludeIdx{testSubjID};
+        
+        testSampleNumb = length(annotation.trueLabel{testSubjID});
+        excludeIdx = annotation.excludeIdx{testSubjID};
+        for trainSubjID = 1:18
+            rawScore = zeros(1, testSampleNumb);
+            rawScore(excludeIdx == 0) = results.scoreStandard{trainSubjID, testSubjID};
+
+            % calculate weighted scores
+            s = rescore3(rawScore, weights, position, excludeIdx);
+            
+            % Use a greedy algorithm to take best scores
+            sNew = maskScores2(s, 7);  % zero out 15 elements         
+            
+            annotation.aScore{trainSubjID, testSubjID} = sNew;
+            
+            fprintf('trainSubj, %d, testSubj, %d\n', trainSubjID, testSubjID);
         end
-        
-        [predLabels, scores] = predict(ldaObj, testSamplePool');
-        
-        results.predLabelBinary{trainSubjID, testSubjID} = predLabels;  % predicted label 0 or 1
-        results.scoreOriginal{trainSubjID, testSubjID} = scores;
-        % LDA retuns two columns of scores.
-        % Each column is the probability to be in each class.
-        % Classes = [others target]
-        results.scoreStandard{trainSubjID, testSubjID} = scores(: ,2); % score: the probability of the second class
-        
-        fprintf('trainSubj, %d, testSubj, %d\n', trainSubjID, testSubjID);
-	end
+    end
+    save([annotationOut filesep testName '_annotation_each.mat'], 'annotation', '-v7.3');
 end
-if ~isdir(scoreOut)   % if the directory is not exist
-	mkdir(scoreOut);  % make the new directory
-end
-save([scoreOut filesep testName '_LDA.mat'], 'results', '-v7.3');

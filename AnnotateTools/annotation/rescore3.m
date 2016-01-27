@@ -1,11 +1,9 @@
-% When it processes the boundary, the the length of wScore is reduced because the out-boundary doesn't have valid scores.
-% In that case, the weight should be also selected in the same way to keep the consistency between the score and the weight.
-% That is the variable weightMask.
-% In the old script uses the original weight vector, but it shold use the weightMask vector.
-% - Kyung
+%% rescore version3
 % 
-% rescore2: doesn't exclude negative scores.
-function s = rescore2(scores, weights, position)
+% revision
+%   - rule out excluded samples from weighting. (Jan. 27, 2016)
+%
+function s = rescore3(scores, weights, position, excludeIdx)
 
 s = zeros(size(scores));
 for k = 1:length(scores)
@@ -18,10 +16,16 @@ end
         realStart = max(1, startPos);
         realEnd = min(length(scores), endPos);
         wScore = scores(realStart:realEnd);
+
         %wScore = wScore(:)';
         weightStart = max(1, realStart - startPos + 1);
         weightEnd = weightStart + realEnd - realStart;
         weightMask = weights(weightStart:weightEnd);
+        
+        excludeMask = excludeIdx(realStart:realEnd); % the index of excluded samples
+        wScore = wScore(excludeMask==0);
+        weightMask = weightMask(excludeMask==0);
+        
         score = sum(wScore.* weightMask);
     end
 end

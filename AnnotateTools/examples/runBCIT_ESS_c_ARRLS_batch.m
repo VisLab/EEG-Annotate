@@ -21,12 +21,14 @@ testNames = {'X3 Baseline Guard Duty'; ...
             'X2 RSVP Expertise'};
             %'Experiment X2 Traffic Complexity'; % 64 channels;
 
+if ~isdir(scoreOut)   % if the directory is not exist
+    mkdir(scoreOut);  % make the new directory
+end
 for t=1:length(testNames)
     testName = testNames{t};
     
     fileListDir = [fileListIn testName]; 
     featureDir = [featureIn testName]; 
-    scoreOutDir = [scoreOut testName]; 
 
     %% Create a level 2 derevied study
     %  To get the list of file names
@@ -91,9 +93,6 @@ for t=1:length(testNames)
 
             fprintf('trainSubj, %d, testSubj, %d\n', trainSubjID, testSubjID);
         end
-    end
-    if ~isdir(scoreOut)   % if the directory is not exist
-        mkdir(scoreOut);  % make the new directory
     end
     save([scoreOut filesep testName '_ARRLS.mat'], 'results', '-v7.3');
 end

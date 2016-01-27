@@ -23,7 +23,6 @@ testName = 'Experiment X2 Traffic Complexity'; % 64 channels;
 
 fileListDir = [fileListIn testName]; 
 featureDir = [featureIn testName]; 
-scoreOutDir = [scoreOut testName]; 
 
 %% Create a level 2 derevied study
 %  To get the list of file names
