@@ -13,7 +13,7 @@ classifierName = 'LDA'; % 'ARRLS'
 
 %% path to raw scores (estimated by classifiers)
 scoreIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_score\';	% path to estimated scores
-annotationOut = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_annotate\';    % save results
+scoreWeightedOut = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_scoreWeighted\';    % save results
 
 % testNames = {'X3 Baseline Guard Duty'; ...
 %             'X4 Advanced Guard Duty'; ...
@@ -28,8 +28,8 @@ testNames = {'X3 Baseline Guard Duty'; ...
             'Experiment X2 Traffic Complexity'; ...
             'Experiment X6 Speed Control'};
 
-if ~isdir(annotationOut)   % if the directory is not exist
-    mkdir(annotationOut);  % make the new directory
+if ~isdir(scoreWeightedOut)   % if the directory is not exist
+    mkdir(scoreWeightedOut);  % make the new directory
 end
         
 for t=1:length(testNames)
@@ -47,19 +47,20 @@ for t=1:length(testNames)
     %% go over all test sets and estimate scores
     testsetNumb = length(results.trueLabelOriginal);
 
-    annotation = struct('trueLabel', [], 'excludeIdx', [], 'aScore', []);  
-    % aScore: annotation score. note that it has the same length to true labels    
+    weightedScore = struct('trueLabel', [], 'excludeIdx', [], 'wScore', []);  
+    % wScore: weighted score. note that it has the same length to true labels    
     
-    annotation.trueLabel = cell(1, testsetNumb);
-    annotation.excludeIdx = cell(1, testsetNumb);
-    annotation.aScore = cell(18, testsetNumb);
+    weightedScore.trueLabel = cell(1, testsetNumb);
+    weightedScore.excludeIdx = cell(1, testsetNumb);
+    weightedScore.wScore = cell(1, testsetNumb);
     
     for testSubjID=1:testsetNumb
-        annotation.trueLabel{testSubjID} = results.trueLabelOriginal{testSubjID};
-        annotation.excludeIdx{testSubjID} = results.excludeIdx{testSubjID};
+        weightedScore.trueLabel{testSubjID} = results.trueLabelOriginal{testSubjID};
+        weightedScore.excludeIdx{testSubjID} = results.excludeIdx{testSubjID};
         
-        testSampleNumb = length(annotation.trueLabel{testSubjID});
-        excludeIdx = annotation.excludeIdx{testSubjID};
+        testSampleNumb = length(weightedScore.trueLabel{testSubjID});
+        excludeIdx = weightedScore.excludeIdx{testSubjID};
+        wScore = zeros(18, testSampleNumb);
         for trainSubjID = 1:18
             rawScore = zeros(1, testSampleNumb);
             rawScore(excludeIdx == 0) = results.scoreStandard{trainSubjID, testSubjID};
@@ -70,10 +71,11 @@ for t=1:length(testNames)
             % Use a greedy algorithm to take best scores
             sNew = maskScores2(s, 7);  % zero out 15 elements         
             
-            annotation.aScore{trainSubjID, testSubjID} = sNew;
+            wScore(trainSubjID, :) = sNew;
             
             fprintf('trainSubj, %d, testSubj, %d\n', trainSubjID, testSubjID);
         end
+        weightedScore.wScore{testSubjID} = wScore;
     end
-    save([annotationOut filesep testName '_annotation_each.mat'], 'annotation', '-v7.3');
+    save([scoreWeightedOut filesep testName '_scoreWeighted.mat'], 'weightedScore', '-v7.3');
 end
