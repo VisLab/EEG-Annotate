@@ -1,7 +1,7 @@
 %% plot annotated samples
 % 
 
-cutOffPercent = 5;
+cutOffPercent = 1;
 beginFrame = 1;
 endFrame = 500;
 
@@ -19,7 +19,8 @@ plotOut = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_plot';
 %             'Experiment XC Calibration Driving'; ...
 %             'X1 Baseline RSVP'; ...
 %             'X2 RSVP Expertise'};
-testNames = {'X3 Baseline Guard Duty'; ...
+testNames = {'Experiment X2 Traffic Complexity'; ...
+            'X3 Baseline Guard Duty'; ...
             'X4 Advanced Guard Duty'; ...
             'Experiment X2 Traffic Complexity'; ...
             'Experiment X6 Speed Control'};
@@ -32,7 +33,7 @@ for t=1:length(testNames)
         mkdir(plotEachOut);  % make the new directory
     end
 
-    load([scoreWeightedIn filesep testName '_scoreWeighted.mat']);  % load results
+    load([scoreWeightedIn filesep testName '_ARRLS_scoreWeighted.mat']);  % load results
     % weightedScore = struct('trueLabel', [], 'excludeIdx', [], 'wScore', []);  
 
     %% go over all test sets and estimate scores
