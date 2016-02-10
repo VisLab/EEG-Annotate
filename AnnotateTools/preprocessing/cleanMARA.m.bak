@@ -1,0 +1,26 @@
+function EEG = cleanMARA(EEG, varargin)
+% Perform MARA cleaning
+% To guarantee the dimension (channels) of the input data and the ICA.weight are agreed,
+% use icachansind.
+try
+    % tempoary EEG set that has only ica processed channels
+    ch_ica = EEG.icachansind;
+    exFlag = ones(length(EEG.chanlocs), 1);
+    exFlag(ch_ica) = 0;
+    ch_exclude = find(exFlag==1);
+    EEGica = pop_select(EEG, 'nochannel', ch_exclude);    % exclude non-ica channels
+    
+    % clean EEG using MARA
+    [ALLEEG, cleanEEG, CURRENTSET] = processMARA(ALLEEG, EEGica, 1);
+
+    % copy cleaned EEG data to the input EEG data that has all (external and internal) channels.
+    EEG.data(ch_ica, :) = cleanEEG.data;
+    
+    EEG.setname = [EEG.setname  ' Cleaned using MARA'];    
+catch mex
+    errorMessages.MARA = ['failed MARA: ' getReport(mex)];
+    errorMessages.status = 'unprocessed';
+    EEG.etc.MARA.errors = errorMessages;
+    fprintf(2, '%s\n', errorMessages.MARA);
+end
+end
