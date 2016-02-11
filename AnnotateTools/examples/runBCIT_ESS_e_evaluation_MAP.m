@@ -38,8 +38,7 @@ for t=1:length(testNames)
     
     APs = zeros(testsetNumb, length(t_tolerance)); % avrage precisions
     
-%    for testSubjID=1:testsetNumb
-    for testSubjID=1:2
+    for testSubjID=1:testsetNumb
         [path, name, ext] = fileparts(filenames{testSubjID});
         scoreDir = [scoreIn testName filesep 'session' filesep sessionNumbers{testSubjID}];
         load([scoreDir filesep name '.mat']);  % load scoreData

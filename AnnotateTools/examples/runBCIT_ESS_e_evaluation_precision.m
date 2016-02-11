@@ -10,9 +10,9 @@ maxAnnotation = 100;
 %% set path to test set
 level2DerivedFile = 'studyLevelDerived_description.xml';
 
-fileListIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz\';	% to get the list of test files
-scoreIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_HP_featureA_scoreA\';
-resultOut = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_HP_featureA_scoreA_results\';
+fileListIn = 'Z:\Data 3\BCIT_ESS\BCIT_ESS_256Hz_ICA_Informax_MARA\';	% to get the list of test files
+scoreIn = 'Z:\Data 3\BCIT_ESS\BCIT_ESS_256Hz_ICA_Informax_MARA_featureA_scoreA\';
+resultOut = 'Z:\Data 3\BCIT_ESS\BCIT_ESS_256Hz_ICA_Informax_MARA_featureA_scoreA_results\';
 
 testNames = {'X3 Baseline Guard Duty'; ...
             'X4 Advanced Guard Duty'; ...
