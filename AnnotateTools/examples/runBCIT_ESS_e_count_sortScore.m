@@ -6,8 +6,8 @@ clear; close all;
 %% parameter
 timingTolerance = 3;
 detailedPlotHeight = 300; % negative (-1) to turn off plotting details
-offPast = 18;
-offFuture = 18;
+offPast = 40;
+offFuture = 80;
 
 % 5 events
 tickLabels = {'Valid', ...          % 1
@@ -16,29 +16,18 @@ tickLabels = {'Valid', ...          % 1
                 'Deny', ...         % 4
                 'No event', ...     % 5
                 'Low score'};       % 6    ==> zero-out score
+
 cmap = [0.2, 0.3, 1.0       % Blue:  'Valid'
         0.0, 0.0, 0.0       % Black: 'Not Valid'  
         0.0, 1.0, 0.0       % Green: 'Allow'  
-        1.0, 0.0, 0.0       % Red:  'Deny'  
-        0.6, 0.6, 0.6       % Gray: false positive (peak, but no event around there)  
-        1.0, 1.0 1.0];      % White:  background, low (or 0) score 
-
-% % 3 events
-% tickLabels = {'Not valid', ...          % 1
-%                 'Valid', ...        % 2
-%                 'No event', ...        % 3
-%                 'Low score'};           % 4    ==> zero-out score
-% cmap = [1.0, 0.0, 0.0       % red:  'Not valid'
-%         0.2, 0.3, 1.0       % blue: 'Valid'  
-%         0.6, 0.6, 0.6       % gray: false positive (peak, but no event around there)  
-%         1.0, 1.0 1.0];      % white:  background, low (or 0) score 
-
+        1.0, 0.0, 0.0];       % Red:  'Deny'  
+            
 %% path to raw scores (estimated by classifiers)
 level2DerivedFile = 'studyLevelDerived_description.xml';
 
-fileListIn = 'Z:\Data 4\annotate\BCIT\BCIT_ESS_256Hz_ICA_Informax_MARA';	% to get the list of test files
-scoreIn = 'Z:\Data 4\annotate\BCIT\BCIT_ESS_256Hz_ICA_Informax_MARA_featureA_scoreA';    % annotated samples
-plotOut = 'Z:\Data 4\annotate\BCIT\BCIT_ESS_256Hz_ICA_Informax_MARA_featureA_scoreA_results';    
+fileListIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR';	% to get the list of test files
+scoreIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreAexcludeOn';    % annotated samples
+countOut = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreAexcludeOn_results';    
 
 % testNames = {'X3 Baseline Guard Duty'; ...
 %             'X4 Advanced Guard Duty'; ...
@@ -70,18 +59,18 @@ for t=1:length(testNames)
         scoreData = []; % init scoreData
         load([scoreDir filesep name '.mat']);  % load scoreData
 
-        plotEachOut = [plotOut filesep 'plot_sortTime__events' num2str(eventNumb) '_tolerance' num2str(timingTolerance) '_offset_' num2str(offPast) '_' num2str(offFuture) filesep testName filesep 'session' filesep sessionNumbers{testSubjID}];
-        if ~isdir(plotEachOut)   % if the directory is not exist
-            mkdir(plotEachOut);  % make the new directory
+        countEachOut = [countOut filesep 'count_sortScore_event' num2str(eventNumb) '_tolerance' num2str(timingTolerance) '_offset_' num2str(offPast) '_' num2str(offFuture) filesep testName filesep 'session' filesep sessionNumbers{testSubjID}];
+        if ~isdir(countEachOut)   % if the directory is not exist
+            mkdir(countEachOut);  % make the new directory
         end
-        plot_sortTime(scoreData.combinedScore{1}, ...
+        count_sortScore(scoreData.combinedScore{1}, ...
                         scoreData.trueLabelOriginal{1}, ...
                         timingTolerance, ...
                         detailedPlotHeight, ...
                         tickLabels, ...
                         cmap, ...
                         offPast, offFuture, ...
-                        plotEachOut, ...
+                        countEachOut, ...
                         [testName ', session '  sessionNumbers{testSubjID}]);
     end
 end

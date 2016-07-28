@@ -6,8 +6,8 @@ clear; close all;
 %% parameter
 timingTolerance = 3;
 detailedPlotHeight = 300; % negative (-1) to turn off plotting details
-offPast = 18;
-offFuture = 18;
+offPast = 8;
+offFuture = 80;
 
 % 5 events
 tickLabels = {'Valid', ...          % 1
@@ -70,7 +70,7 @@ for t=1:length(testNames)
         scoreData = []; % init scoreData
         load([scoreDir filesep name '.mat']);  % load scoreData
 
-        plotEachOut = [plotOut filesep 'sortEv_Sc_events' num2str(eventNumb) '_tolerance' num2str(timingTolerance) '_offset_' num2str(offPast) '_' num2str(offFuture) filesep testName filesep 'session' filesep sessionNumbers{testSubjID}];
+        plotEachOut = [plotOut filesep 'plot_sortEv_Sc_events' num2str(eventNumb) '_tolerance' num2str(timingTolerance) '_offset_' num2str(offPast) '_' num2str(offFuture) filesep testName filesep 'session' filesep sessionNumbers{testSubjID}];
         if ~isdir(plotEachOut)   % if the directory is not exist
             mkdir(plotEachOut);  % make the new directory
         end

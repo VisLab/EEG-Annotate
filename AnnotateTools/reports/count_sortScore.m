@@ -1,9 +1,9 @@
 %% plot categories
-%   - sorted by event types
+%   - sorted by score
 % 
 %  events + backgroud : 
 %
-function plot_sortEvent(scores, trueLabels, timingTolerance, detailHeight, tickLabels, cmap, offPast, offFuture, outPath, titleStr)    
+function count_sortScore(scores, trueLabels, timingTolerance, detailHeight, tickLabels, cmap, offPast, offFuture, outPath, titleStr)    
     
     xticklabel = cell((offPast+offFuture+1), 1);
     for i=1:2:(offPast+offFuture+1)
@@ -15,10 +15,8 @@ function plot_sortEvent(scores, trueLabels, timingTolerance, detailHeight, tickL
     switch eventNumb
         case 3
             plotLabels = convertTrue2Plot_BCIT_event3(trueLabels);
-            colorbar_ticks = 1.4:(4.35-1.4)/4:4.35;
         case 5
             plotLabels = convertTrue2Plot_BCIT_event5(trueLabels);
-            colorbar_ticks = 1.4:(6.5-1.4)/6:6.5;
         otherwise
             error('check the event number');
     end
@@ -26,25 +24,31 @@ function plot_sortEvent(scores, trueLabels, timingTolerance, detailHeight, tickL
     pickIdx = find(scores > 0);
     plotData = generatePlotData(plotLabels, pickIdx, offPast, offFuture, timingTolerance, eventNumb); 
 
-    eventLabels = plotData(:, offPast+1);
-    [~, sIdx] = sort(eventLabels, 'ascend');
+    pickScores = scores(pickIdx);
+    [~, sIdx] = sort(pickScores, 'descend');
     sortData = plotData(sIdx, :);
 
+    countData = [];
+    for e=1:4
+        tmp = (sortData == e);
+        countData = cat(1, countData, sum(tmp, 1));
+    end
+    
     hf1 = figure(1); clf;
-    set(hf1, 'Position', [1, 41, 1600, 1083]);
-    imagesc(sortData, [1 length(tickLabels)]);
-    colormap(cmap);
-
-    colorbar('Ticks',colorbar_ticks,'TickLabels',tickLabels, 'Direction', 'reverse');
+    set(hf1, 'Position', [1, 41, 1600, 500]);
+    set(gca, 'ColorOrder', cmap, 'NextPlot', 'replacechildren');
+    plot(countData', 'LineWidth', 2);
+    xlim([1 size(countData, 2)]);
+    legend('Valid', 'Not valid', 'Allow', 'Deny');
     set(gca, 'XTick', 1:(offPast+offFuture+1), 'XTickLabel', xticklabel);
     
     xlabel('Time (8 intervals / 1 second)');
-    ylabel('Samples (sorted by events & time)');
+    ylabel('Count');
     title(titleStr);
     
-    saveas(hf1, [outPath filesep 'plotWhole.fig']);
+    saveas(hf1, [outPath filesep 'countWhole.fig']);
     img = getframe(hf1);
-    imwrite(img.cdata, [outPath filesep 'plotWhole.png']);
+    imwrite(img.cdata, [outPath filesep 'countWhole.png']);
 
     if detailHeight > 0  % plot details
         plotHeight = size(sortData, 1);
@@ -54,21 +58,26 @@ function plot_sortEvent(scores, trueLabels, timingTolerance, detailHeight, tickL
             plotBegin = (p-1)*detailHeight+1;
             plotEnd = plotBegin+detailHeight-1;
 
+            countData = [];
+            for e=1:4
+                tmp = (sortData(plotBegin:plotEnd, :) == e);
+                countData = cat(1, countData, sum(tmp, 1));
+            end
+            
             hf1 = figure(1); clf;
-            imagesc(sortData(plotBegin:plotEnd, :), [1 length(tickLabels)]);
-            colormap(cmap);
-
-            colorbar('Ticks',colorbar_ticks,'TickLabels',tickLabels, 'Direction', 'reverse');
+            set(gca, 'ColorOrder', cmap, 'NextPlot', 'replacechildren');
+            plot(countData', 'LineWidth', 2);
+            xlim([1 size(countData, 2)]);
+            legend('Valid', 'Not valid', 'Allow', 'Deny');
             set(gca, 'XTick', 1:(offPast+offFuture+1), 'XTickLabel', xticklabel);
-            set(gca, 'YTick', [1 detailHeight], 'YTickLabel', {num2str(plotBegin), num2str(plotEnd)});
 
             xlabel('Time (8 intervals / 1 second)');
-            ylabel('Samples (sorted by events & time)');
+            ylabel('Count');
             title([titleStr ', detail ' num2str(p)]);
-            
-            saveas(hf1, [outPath filesep 'plotDetail' num2str(p) '.fig']);
+
+            saveas(hf1, [outPath filesep 'countDetail' num2str(p) '.fig']);
             img = getframe(hf1);
-            imwrite(img.cdata, [outPath filesep 'plotDetail' num2str(p) '.png']);
+            imwrite(img.cdata, [outPath filesep 'countDetail' num2str(p) '.png']);
         end
     end
 end

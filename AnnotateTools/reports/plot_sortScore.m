@@ -31,6 +31,7 @@ function plot_sortScore(scores, trueLabels, timingTolerance, detailHeight, tickL
     sortData = plotData(sIdx, :);
 
     hf1 = figure(1); clf;
+    set(hf1, 'Position', [1, 41, 1600, 1083]);
     imagesc(sortData, [1 length(tickLabels)]);
     colormap(cmap);
 

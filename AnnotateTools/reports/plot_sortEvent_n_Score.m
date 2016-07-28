@@ -35,6 +35,7 @@ function plot_sortEvent_n_Score(scores, trueLabels, timingTolerance, detailHeigh
     sortByEvent_n_Score = sortByScore(sIdx, :);
 
     hf1 = figure(1); clf;
+    set(hf1, 'Position', [1, 41, 1600, 1083]);
     imagesc(sortByEvent_n_Score, [1 length(tickLabels)]);
     colormap(cmap);
 

@@ -29,6 +29,7 @@ function plot_sortTime(scores, trueLabels, timingTolerance, detailHeight, tickLa
     sortData = plotData;  % it is already sorted by time.
 
     hf1 = figure(1); clf;
+    set(hf1, 'Position', [1, 41, 1600, 1083]);
     imagesc(sortData, [1 length(tickLabels)]);
     colormap(cmap);
 

@@ -119,7 +119,7 @@ for t=1:length(testNames)
 %             end
 %         end
     end
-    countOut = [resultOut filesep 'countDistance_max' num2str(maxDistance) filesep testName];
+    countOut = [resultOut filesep 'count_Distance_max' num2str(maxDistance) filesep testName];
     if ~isdir(countOut)   % if the directory is not exist
         mkdir(countOut);  % make the new directory
     end

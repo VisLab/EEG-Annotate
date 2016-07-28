@@ -70,7 +70,7 @@ for t=1:length(testNames)
         scoreData = []; % init scoreData
         load([scoreDir filesep name '.mat']);  % load scoreData
 
-        plotEachOut = [plotOut filesep 'sortEvent_events' num2str(eventNumb) '_tolerance' num2str(timingTolerance) '_offset_' num2str(offPast) '_' num2str(offFuture) filesep testName filesep 'session' filesep sessionNumbers{testSubjID}];
+        plotEachOut = [plotOut filesep 'plot_sortEvent_events' num2str(eventNumb) '_tolerance' num2str(timingTolerance) '_offset_' num2str(offPast) '_' num2str(offFuture) filesep testName filesep 'session' filesep sessionNumbers{testSubjID}];
         if ~isdir(plotEachOut)   % if the directory is not exist
             mkdir(plotEachOut);  % make the new directory
         end
