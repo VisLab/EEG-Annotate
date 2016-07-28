@@ -9,11 +9,9 @@
 targetClass = '35';
 
 % ARRLS option
-options.p = 10;             % keep default
-options.sigma = 0.1;        % keep default
-options.lambda = 10.0;      % keep default
-options.gamma = 1.0;        % [0.1,10]
-options.ker = 'linear';        % 'rbf' | 'linear'
+optionARRLS = struct('ker', 'linear', 'sigma', 0.1, 'lambda', 10.0, 'gamma', 1.0, 'p', 10);
+optionIMB = struct('BT', 1, 'AC1', 5, 'W', [1 1 0], 'AC2', 0, 'thresBalance', 0.50); % 0 (false, skip), 1 (true, include it)
+optionETC = struct('bVerbose', 0);
 
 % set path to training set
 trainInPath = 'Z:\Data 2\Kyung\autoLabeling\data\AveragePower\zeroMean_unitStd\non_time_locked'; % path to VEP data set (extracted feature)
@@ -75,22 +73,25 @@ for t=1:length(testNames)
             [trainSamplePool, trainLabelPool] = getTrainingData(trainInPath, trainFileName, targetClass);
 
             % balance training samples 
-            [trainSample, trainLabel] = balanceOverMinor(trainSamplePool, trainLabelPool);
+            %[trainSample, trainLabel] = balanceOverMinor(trainSamplePool, trainLabelPool);
  
             % ARRLS calculates scores for each labels. If there are five labels, it will calculates 5 scores.
             % So make sure that there are only two labels in [trainLabel testLabel]
-            [~,predLabels,~,scores] = ARRLSkyung(double(trainSample), double(testSamplePool), trainLabel, testLabeltemp, options);
+            %[~,predLabels,~,scores] = ARRLSkyung(double(trainSample), double(testSamplePool), trainLabel, testLabeltemp, options);
+            
+            [~, finalScore, finalCutoff, ~, ~] = ARRLS_imb(trainSamplePool, testSamplePool, trainLabelPool, testLabeltemp, optionARRLS, optionIMB, optionETC);        
+            predLabels = (finalScore > finalCutoff);
 
-            scoreData.predLabelBinary{trainSubjID} = predLabels - 1;  % predicted label 0 or 1
-            scoreData.scoreOriginal{trainSubjID} = scores;
+            scoreData.predLabelBinary{trainSubjID} = predLabels;  % predicted label 0 or 1
+            scoreData.scoreOriginal{trainSubjID} = finalScore;
 
             % convert the result formats to the standard format 
             %
             % ARRLS retuns two scores for each class.
             % First it z-scales scores so that they have same scales.
             % Standard scores are defined as the difference of scaled scores.        
-            scores = zscore(scores);                % z-normalization scores for each class
-            scoreData.scoreStandard{trainSubjID} = scores(:, 2) - scores(:, 1);   % score: target score - non-target score
+            %scores = zscore(scores);                % z-normalization scores for each class
+            scoreData.scoreStandard{trainSubjID} = finalScore;   % score: target score - non-target score
 
             fprintf('trainSubj, %d, testSubj, %d\n', trainSubjID, testSubjID);
         end
