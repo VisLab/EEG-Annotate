@@ -1,4 +1,9 @@
-function [W, elapse] = graph(fea,options)
+%% graph script comes with ARTL demo
+%  
+%  To avoid the name conflict with the MATLAB R2015b builtin function,
+%  change the name from graph.m to graph_ARLT.m
+%
+function [W, elapse] = graph_ARTL(fea,options)
 %	Usage:
 %	W = graph(fea,options)
 %

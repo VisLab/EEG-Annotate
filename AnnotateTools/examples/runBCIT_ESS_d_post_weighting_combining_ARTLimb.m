@@ -17,7 +17,7 @@ weights = [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5];
 level2DerivedFile = 'studyLevelDerived_description.xml';
 
 fileListIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR\';	% to get the list of test files
-scoreBase = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreA\';	% path to estimated scores
+scoreBase = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreARTLimb\';	% path to estimated scores
 
 % testNames = {'X3 Baseline Guard Duty'; ...
 %             'X4 Advanced Guard Duty'; ...
@@ -27,7 +27,7 @@ scoreBase = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreA\';	% path 
 %             'Experiment XC Calibration Driving'; ...
 %             'X1 Baseline RSVP'; ...
 %             'X2 RSVP Expertise'};
-testNames = {'Experiment XC Calibration Driving'};
+testNames = {'Experiment XB Baseline Driving'};
 
 for t=1:length(testNames)
     testName = testNames{t};
@@ -41,7 +41,7 @@ for t=1:length(testNames)
     [filenames, dataRecordingUuids, taskLabels, sessionNumbers, subjects] = getFilename(obj);
     
     % go over all files and apply a feature extraction function
-    for testSubjID=1:length(filenames)
+    for testSubjID=1:length(filenames)  %1:length(filenames)
         [path, name, ext] = fileparts(filenames{testSubjID});
         scoreDir = [scoreBase testName filesep 'session' filesep sessionNumbers{testSubjID}];
         scoreData = []; % init scoreData  
@@ -55,6 +55,11 @@ for t=1:length(testNames)
         allScores = [];
         for trainSubjID = 1:trainsetNumb
             rawScore = zeros(1, testSampleNumb);
+            % to update the score into zscore: standarize the scores
+            if std(scoreData.scoreStandard{trainSubjID}) ~= 1.0 % if always true, why??
+                scoreData.scoreStandard{trainSubjID} = zscore(scoreData.scoreStandard{trainSubjID});
+            end
+            
             rawScore(excludeIdx == 0) = scoreData.scoreStandard{trainSubjID};
 
             % calculate weighted scores

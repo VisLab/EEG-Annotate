@@ -10,27 +10,29 @@ targetClass = '35';
 
 % ARRLS option
 optionARRLS = struct('ker', 'linear', 'sigma', 0.1, 'lambda', 10.0, 'gamma', 1.0, 'p', 10);
-optionIMB = struct('BT', 1, 'AC1', 5, 'W', [1 1 0], 'AC2', 0, 'thresBalance', 0.50); % 0 (false, skip), 1 (true, include it)
+optionIMB = struct('BT', 1, 'AC1', 5, 'W', [1 1 0], 'AC2', 5); % 0 (false, skip), 1 (true, include it)
 optionETC = struct('bVerbose', 0);
 
 % set path to training set
-trainInPath = 'Z:\Data 2\Kyung\autoLabeling\data\AveragePower\zeroMean_unitStd\non_time_locked'; % path to VEP data set (extracted feature)
+trainInPath = 'Z:\Data 4\annotate\VEP\AveragePower\zeroMean_unitStd\non_time_locked'; % path to VEP data set (extracted feature)
 
 % set path to test set
 level2DerivedFile = 'studyLevelDerived_description.xml';
 
-fileListIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz\';	% to get the list of test files
-featureIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR_featureA\'; % path to extracted features
-scoreOut = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR_featureA_scoreA\';    % save results
+fileListIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR\';	% to get the list of test files
+featureIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA\'; % path to extracted features
+scoreOut = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreARTLimb\';    % save results
 
-testNames = {'X3 Baseline Guard Duty'; ...
-            'X4 Advanced Guard Duty'; ...
-            'Experiment X2 Traffic Complexity'; ...
-            'Experiment X6 Speed Control'; ...
-            'Experiment XB Baseline Driving'; 
-            'Experiment XC Calibration Driving'; ...
-            'X1 Baseline RSVP'; ...
-            'X2 RSVP Expertise'};
+testNames = {'Experiment XB Baseline Driving'; 
+            'Experiment XC Calibration Driving'};
+% testNames = {'X3 Baseline Guard Duty'; ...
+%             'X4 Advanced Guard Duty'; ...
+%             'Experiment X2 Traffic Complexity'; ...
+%             'Experiment X6 Speed Control'; ...
+%             'Experiment XB Baseline Driving'; 
+%             'Experiment XC Calibration Driving'; ...
+%             'X1 Baseline RSVP'; ...
+%             'X2 RSVP Expertise'};
 
 for t=1:length(testNames)
     testName = testNames{t};
@@ -83,7 +85,7 @@ for t=1:length(testNames)
             predLabels = (finalScore > finalCutoff);
 
             scoreData.predLabelBinary{trainSubjID} = predLabels;  % predicted label 0 or 1
-            scoreData.scoreOriginal{trainSubjID} = finalScore;
+            scoreData.scoreOriginal{trainSubjID} = zscore(finalScore);
 
             % convert the result formats to the standard format 
             %
@@ -91,7 +93,7 @@ for t=1:length(testNames)
             % First it z-scales scores so that they have same scales.
             % Standard scores are defined as the difference of scaled scores.        
             %scores = zscore(scores);                % z-normalization scores for each class
-            scoreData.scoreStandard{trainSubjID} = finalScore;   % score: target score - non-target score
+            scoreData.scoreStandard{trainSubjID} = zscore(finalScore);   % score: target score - non-target score
 
             fprintf('trainSubj, %d, testSubj, %d\n', trainSubjID, testSubjID);
         end

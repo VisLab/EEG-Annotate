@@ -16,24 +16,26 @@ options.gamma = 1.0;        % [0.1,10]
 options.ker = 'linear';        % 'rbf' | 'linear'
 
 % set path to training set
-trainInPath = 'Z:\Data 2\Kyung\autoLabeling\data\AveragePower\zeroMean_unitStd\non_time_locked'; % path to VEP data set (extracted feature)
+trainInPath = 'Z:\Data 4\annotate\VEP\AveragePower\zeroMean_unitStd\non_time_locked'; % path to VEP data set (extracted feature)
 
 % set path to test set
 level2DerivedFile = 'studyLevelDerived_description.xml';
 
-fileListIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz\';	% to get the list of test files
-featureIn = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR_featureA\'; % path to extracted features
-scoreOut = 'Z:\Data 3\BCIT_ESS\Level2_256Hz_ASR_featureA_scoreA\';    % save results
+fileListIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR\';	% to get the list of test files
+featureIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA\'; % path to extracted features
+scoreOut = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreA\';    % save results
 
-testNames = {'X3 Baseline Guard Duty'; ...
-            'X4 Advanced Guard Duty'; ...
-            'Experiment X2 Traffic Complexity'; ...
-            'Experiment X6 Speed Control'; ...
-            'Experiment XB Baseline Driving'; 
-            'Experiment XC Calibration Driving'; ...
-            'X1 Baseline RSVP'; ...
-            'X2 RSVP Expertise'};
+% testNames = {'X3 Baseline Guard Duty'; ...
+%             'X4 Advanced Guard Duty'; ...
+%             'Experiment X2 Traffic Complexity'; ...
+%             'Experiment X6 Speed Control'; ...
+%             'Experiment XB Baseline Driving'; 
+%             'Experiment XC Calibration Driving'; ...
+%             'X1 Baseline RSVP'; ...
+%             'X2 RSVP Expertise'};
 
+testNames = {'Experiment XC Calibration Driving'};     
+        
 for t=1:length(testNames)
     testName = testNames{t};
 
@@ -47,7 +49,7 @@ for t=1:length(testNames)
     [filenames, dataRecordingUuids, taskLabels, sessionNumbers, subjects] = getFilename(obj);
 
     % go over all files and apply a feature extraction function
-    for testSubjID=1:length(filenames)
+    for testSubjID=2:length(filenames)
         
         scoreData = struct('trueLabelOriginal', [], 'excludeIdx', [], 'predLabelBinary', [], 'scoreStandard', [], 'scoreOriginal', []);
         scoreData.trueLabelOriginal = cell(1, 1);

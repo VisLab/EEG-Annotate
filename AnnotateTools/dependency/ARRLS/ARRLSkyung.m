@@ -59,7 +59,7 @@ manifold.k = options.p;
 manifold.Metric = 'Cosine';
 manifold.NeighborMode = 'KNN';
 manifold.WeightMode = 'Cosine';
-W = graph(X',manifold);
+W = graph_ARTL(X',manifold);
 Dw = diag(sparse(sqrt(1./sum(W))));
 L = speye(nm)-Dw*W*Dw;
 
