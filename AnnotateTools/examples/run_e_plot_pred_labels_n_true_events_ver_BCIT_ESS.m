@@ -5,9 +5,9 @@ clear; close all;
 %% path to raw scores (estimated by classifiers)
 level2DerivedFile = 'studyLevelDerived_description.xml';
 
-fileListIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR';	% to get the list of test files
-scoreIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreARTLimb';    % annotated samples
-plotOut = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreARTLimb_results';    
+fileListIn = 'Z:\Data 4\annotate\BCIT\BE_256Hz_II_MARA';	% to get the list of test files
+scoreIn = 'Z:\Data 4\annotate\BCIT\BE_256Hz_II_MARA_fA_sAi_35_1_6_110_6';    % annotated samples
+plotOut = 'Z:\Data 4\annotate\BCIT\BE_256Hz_II_MARA_fA_sAi_35_1_6_110_6_results';    
 
 % testNames = {'X3 Baseline Guard Duty'; ...
 %             'X4 Advanced Guard Duty'; ...
@@ -17,7 +17,7 @@ plotOut = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreARTLimb_result
 %             'Experiment XC Calibration Driving'; ...
 %             'X1 Baseline RSVP'; ...
 %             'X2 RSVP Expertise'};
-testNames = {'Experiment XC Calibration Driving'};
+testNames = {'EXC'};
 
 for t=1:length(testNames)
     testName = testNames{t};
@@ -31,7 +31,7 @@ for t=1:length(testNames)
     [filenames, dataRecordingUuids, taskLabels, sessionNumbers, subjects] = getFilename(obj);
     
     % go over all files and apply a feature extraction function
-    for testSubjID=2:length(filenames)
+    for testSubjID=1:length(filenames)
         [path, name, ext] = fileparts(filenames{testSubjID});
         scoreDir = [scoreIn filesep testName filesep 'session' filesep sessionNumbers{testSubjID}];
         scoreData = []; % init scoreData

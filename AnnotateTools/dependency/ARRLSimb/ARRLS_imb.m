@@ -85,6 +85,9 @@ function [Yp, finalScore, finalCutoff, initProb, initCutoff] = ARRLS_imb(Xs, Xt,
     elseif optionIMB.AC1 == 5 
         [initCutoff, mu1, sigma1, mu2, sigma2, xgrid] = getCutoff_FL3(initProb, 0.5);
         %[initCutoff, mu1, sigma1, mu2, sigma2, xgrid, bFlagGMM] = getCutoff_FL3(initProb, 0.5, optionIMB.thresBalance);
+    elseif optionIMB.AC1 == 6 
+        [initCutoff, mu1, sigma1, mu2, sigma2, xgrid] = getCutoff_FL4(initProb, 'right');
+        %[initCutoff, mu1, sigma1, mu2, sigma2, xgrid, bFlagGMM] = getCutoff_FL3(initProb, 0.5, optionIMB.thresBalance);
     else
         error('unsupported adaptive cutoff option');
     end
@@ -223,6 +226,8 @@ function [Yp, finalScore, finalCutoff, initProb, initCutoff] = ARRLS_imb(Xs, Xt,
         finalCutoff = getCutoff_FL2(finalScore, 0.0);
     elseif optionIMB.AC2 == 5 
         finalCutoff = getCutoff_FL3(finalScore, 0.0);
+    elseif optionIMB.AC2 == 6 
+        finalCutoff = getCutoff_FL4(finalScore, 'right');
     else
         error('unsupported adaptive cutoff option');
     end

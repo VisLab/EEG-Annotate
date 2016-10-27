@@ -6,11 +6,11 @@
 %
 
 %  classification parameter
-targetClass = '35';
+targetClass = '34';
 
 % ARRLS option
 optionARRLS = struct('ker', 'linear', 'sigma', 0.1, 'lambda', 10.0, 'gamma', 1.0, 'p', 10);
-optionIMB = struct('BT', 1, 'AC1', 5, 'W', [1 1 0], 'AC2', 5); % 0 (false, skip), 1 (true, include it)
+optionIMB = struct('BT', 1, 'AC1', 6, 'W', [1 1 0], 'AC2', 6); % 0 (false, skip), 1 (true, include it)
 optionETC = struct('bVerbose', 0);
 
 % set path to training set
@@ -21,7 +21,7 @@ level2DerivedFile = 'studyLevelDerived_description.xml';
 
 fileListIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR\';	% to get the list of test files
 featureIn = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA\'; % path to extracted features
-scoreOut = 'Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreARTLimb\';    % save results
+scoreOut = ['Z:\Data 4\annotate\BCIT\Level2_256Hz_ASR_featureA_scoreARTLimb_' num2str(targetClass) '_' num2str(optionIMB.BT) '_' num2str(optionIMB.AC1) '_' num2str(optionIMB.W(1)) num2str(optionIMB.W(2)) num2str(optionIMB.W(3)) '_' num2str(optionIMB.AC2)  '\'];    % save results
 
 testNames = {'Experiment XB Baseline Driving'; 
             'Experiment XC Calibration Driving'};

@@ -1,18 +1,21 @@
 %% plot 
 %
-function sureCount = plot_pred_labelsScoreOverlap_n_true_events_marking(predLabels, predScores, trueLabels, excludeIdx, outPath, titleStr)    
+function sureCount = plot_pred_scores_n_true_events_marking(predScores, trueLabels, outPath, titleStr)    
 
-    allPredLabels = get_pred_labelsScoreOverlap(predLabels, predScores, excludeIdx);
+    allPredLabels = zeros(length(predScores), length(trueLabels));
+    for i=1:length(predScores)
+        allPredLabels(i, :) = (predScores{i} > 0);
+    end
     
     yTickLabels = {'Test set'};
-    for i = 1:length(predLabels)
+    for i = 1:length(predScores)
         yTickLabels{i+1} = [num2str(i, '%02d') ' (' num2str(sum(allPredLabels(i, :)), '%04d') ')' ];
     end
 
     % if the samples in 0.5 second periods are detected by all classifiers, highlight them with red color.
     [allPredLabels, sureIdx] = highLight_surePattern(allPredLabels, 2, 1.0, 0.75);
-    sureCount = sum(sureIdx);
-    
+    sureCount = sum(sureIdx);	
+	
     binTrueLabel = zeros(1, length(trueLabels));
     for i = 1:length(trueLabels)
         if ~isempty(trueLabels{i})
@@ -33,7 +36,10 @@ function sureCount = plot_pred_labelsScoreOverlap_n_true_events_marking(predLabe
           0.00 0.85 1.00     % 0.25: light blue 
           0.6 0.6 0.6          % 0.5: grey
           1.0 0 0            % 0.75: red
-          0 0 0];            % black
+          0 0 0];            % black	
+%    map = [1, 1, 1
+%          0.00, 0.85, 1.00     % light blue
+%          0, 0, 0];
     colormap(map);	
     set(gca, 'YTick', (1:size(plotTemp, 1)));     set(gca, 'YTickLabel', yTickLabels);
     xtickCount = floor(length(trueLabels) / 40);
@@ -55,6 +61,7 @@ function sureCount = plot_pred_labelsScoreOverlap_n_true_events_marking(predLabe
         endF = beginF + 499;
         xlim([beginF-1 endF]);
         title([titleStr ' (' num2str(beginF) ' - ' num2str(endF) ' of ' num2str(length(trueLabels)) ' samples) (Sure: ' num2str(sureCount) ', ' num2str(sureCount*100/length(trueLabels), '%.2f') '%)']);
+%        title([titleStr ' (' num2str(beginF) ' - ' num2str(endF) ' of ' num2str(length(trueLabels)) ' samples)']);
         img = getframe(gcf);
         imwrite(img.cdata, [outPath filesep 'sample_' num2str(beginF, '%05d') '_' num2str(endF, '%05d') '.png']);
         beginF = beginF + 500;
