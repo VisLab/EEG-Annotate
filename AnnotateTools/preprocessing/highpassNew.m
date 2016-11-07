@@ -3,7 +3,7 @@ function EEG = highpassNew(EEG, varargin)
 % Parameters
 %     burstCriterion    Standard deviation cutoff for removal of bursts (Default: 5)
 try
-%Setup the parameters and reporting for the call   
+    % Convert name-value pair parameters to structure   
     params = vargin2struct(varargin);  
     arg_cutoff = 1;   % defatult 
     if isfield(params, 'cutoff')
