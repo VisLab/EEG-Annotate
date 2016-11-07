@@ -1,6 +1,0 @@
-1/12/2016
-- extract feature
-- estimate scores
-- how to determine threshold?
-- what is the best way to combine learners?
-- Low density headset issue ==> test with prep, without prep, try BOW feature

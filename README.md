@@ -10,13 +10,5 @@ Tools for annotating continuous EEG signals
 - update path in the example script
 - run an example script (tested with MATLAB R2015a)
 
-# Suggested order of running examples
- 1) runBCIT_ESS_a_ASR_Cleaning.m : cleaning raw EEG (optional)
- 
- 2) runBCIT_ESS_b_averagePower_feature.m : extracting feature (average power)
- 
- 3) runBCIT_ESS_c_X_classification.m : estimating scores of test samples (using X classifier)
-
- 4) runBCIT_ESS_d_weightScore.m : weighting and zero-outing scores
- 
- 5) runBCIT_ESS_e_report.m : report annotation results
+# Example scripts
+  run_main.m under /AnnotateTools/examples/
