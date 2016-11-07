@@ -1,4 +1,9 @@
-%% 
+%% Remove artifacts from the all EEG datasets in the inPath
+%  
+%  Parameters:
+%       inPat: the pash to the EEG datasets
+%       outPath: the path to the place where cleaned EEG datasets are saved
+%       burstCriterion: standard deviation cutoff for removal of bursts (Default: 5)
 %
 function outPath = batch_preprocess_cleanASR(inPath, varargin)
 

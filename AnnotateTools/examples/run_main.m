@@ -6,14 +6,17 @@
 %  4) Score estimation2: annotation score of window samples
 %  5) Report
 %
-%  This script produces the results used for the paper.
-%  "Automated annotation for continuous EEG data", Kyung-min Su, W. David Hairston, Kay Robbins, 2016
+%  Reference:
+%  Kyung-min Su, W. David Hairston, Kay Robbins, "Automated annotation for continuous EEG data", 2016
 %  
+%  Kyung-min Su, The University of Texas at San Antonio, 2016-11-07
+%
 
 clear; close all;
 
 %% 1) Preprocess
 %  Apply general preprocessings on the raw EEG data
+%  Do high pass filtering and remove artifacts using the ASR tool
 batch_preprocess_highPassNew('Z:\Data 4\annotate\VEP\preprocessedRAW\', ...
              'outPath', '.\tmp\highPass', ...
              'cutoff', 0.5);
@@ -22,6 +25,10 @@ batch_preprocess_cleanASR('.\tmp\highPass', ...
              'burstCriterion', 20);
 
 %% 2) Feature extraction
+%  Feature: avearge power of subbands and subwindows
+%  Note: to process different headsets data in the same way, 
+%        it generates new EEG data for the target headset 
+%        and extracts features from the new data.
 batch_feature_averagePower('.\tmp\cleanASR', ...
              'outPath', '.\tmp\averagePower', ...
              'targetHeadset', 'biosemi64.sfp', ...
@@ -31,6 +38,9 @@ batch_feature_averagePower('.\tmp\cleanASR', ...
              'step', 0.125);
 
 %% 3) Classification score of sub-window samples
+%   Using ARRLS classifier or LDA classifier
+%   For training classifiers, use VEP datasets having friend (34) and foe (35) classes
+%   In this test, we use the same (VEP) datasets for training and for test.
 batch_classify_ARRLSs('.\tmp\averagePower', ...  % test data
              '.\tmp\averagePower', ...          % training data
              'outPath', '.\tmp\scoreARRLS', ...
@@ -42,6 +52,8 @@ batch_classify_ARRLSs('.\tmp\averagePower', ...  % test data
              'ker', 'linear');
 
 %% 4) Annotation score of window samples
+%  Estimate annotation scores from classification scores.
+%  using weighting, zero-out, and fuzzy voting
 batch_annotation('.\tmp\scoreARRLS', ...
              'outPath', '.\output\annotation', ...
              'excludeSelf', true, ...
@@ -50,6 +62,7 @@ batch_annotation('.\tmp\scoreARRLS', ...
              'weights', [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5]);
 
 %%  5) Report
+%   Generate reports like precision, recall, and plots
 batch_report_recall('.\output\annotation', ...
              'outPath', '.\output\report', ...
              'timinigTolerance', 0:7, ...
