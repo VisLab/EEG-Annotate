@@ -37,7 +37,7 @@ batch_feature_averagePower('.\tmp\cleanASR', ...
              'subWindowLength', 0.125, ...
              'step', 0.125);
 
-%% 3) Classification score of sub-window samples
+%% 3) Classification score of window samples
 %   Using ARRLS classifier or LDA classifier
 %   For training classifiers, use VEP datasets having friend (34) and foe (35) classes
 %   In this test, we use the same (VEP) datasets for training and for test.
@@ -51,7 +51,7 @@ batch_classify_ARRLSs('.\tmp\averagePower', ...  % test data
              'gamma', 1.0, ...
              'ker', 'linear');
 
-%% 4) Annotation score of window samples
+%% 4) Annotation score of sub-window
 %  Estimate annotation scores from classification scores.
 %  using weighting, zero-out, and fuzzy voting
 batch_annotation('.\tmp\scoreARRLS', ...

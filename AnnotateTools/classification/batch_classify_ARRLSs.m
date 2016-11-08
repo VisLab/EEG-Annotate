@@ -1,4 +1,8 @@
-%% 
+%% Estimate classification scores of samples using the ARRLS classifier
+%  
+%  Parameters:
+%       inPat: the pash to the data (samples and classes)
+%       outPath: the path to the place where estimated scores are saved
 %
 function outPath = batch_classify_ARRLSs(inPath_test, inPath_train, varargin)
 
@@ -15,7 +19,6 @@ function outPath = batch_classify_ARRLSs(inPath_test, inPath_train, varargin)
 
     % go over all files and preprocess them using the specified function
     fileList_test = dir([inPath_test filesep '*.mat']);
-    
     for i=1:length(fileList_test)
         dataTest = load([inPath_test filesep fileList_test(i).name]);
         scoreData = classify_ARRLSs(dataTest, inPath_train, varargin{:});

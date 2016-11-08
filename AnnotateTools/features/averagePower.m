@@ -3,14 +3,14 @@
 %
 %  parameters:
 %   EEG: EEG data (in EEGLAB structure)
-%   subbands: frequency ranges of each band
-%   filterOrder to define the width of transition bands
-%   windowLength: the length of a window (in second)
-%   subWindowLength: the length of sub-window (in second)
-%   step: the gap between sub-windows (or windows) (in second)
+%   subbands: frequency ranges of each sub-band (default: [0 4; 4 8; 8 12; 12 16; 16 20; 20 24; 24 28; 28 32])
+%   windowLength: the length of a window in second (default: 1 second)
+%   subWindowLength: the length of a sub-window in second (default: 0.125 seconds)
+%   step: the distance between windows in second (default: 0.125 seconds), if step < windowLength, windows are overlapped.
+%   targetHeadset: the headset on which interpolate EEG data
 %
 %  output:
-%    feature: structure
+%    data: structure
 %      name       (name of the dataset in a way that allows one to identify it uniquely) <== if we save the features seperately for each dataset, we don't need this field.
 %      channels   (vector of channel numbers corresponding to rows of feature vectors)
 %      samples    (2D array feature size x number of features - features are in the columns)
@@ -21,10 +21,10 @@
 %      exclComment (exlain the reason of exclusion. i.e. overlap with boundary samples)
 %    config: structure
 %      subbands
-%      filterOrder
 %      windowLength
 %      subLength
 %      step
+%    history: structure
 %
 function [data, config, history] = averagePower(EEG, varargin)
 try
@@ -99,7 +99,7 @@ try
     
     % fill the feature samples, labels, and times field
     % features = accumulated data of (bandPass filtered average power) 
-    [data.samples,  data.labels, data.times, history.subbands] = getSampleFeatures(EEGintp, config);
+    [data.samples, data.labels, data.times, history.subbands] = getSampleFeatures(EEGintp, config);
 
     % mask to exclude samples
     % 1) end of samples

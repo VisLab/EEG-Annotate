@@ -3,7 +3,6 @@
 %  Parameters:
 %       inPat: the pash to the EEG datasets
 %       outPath: the path to the place where filtered EEG datasets are saved
-%       cutoff: cutoff of the high pass filter
 %
 function outPath = batch_preprocess_highPassNew(inPath, varargin)
 
@@ -22,7 +21,7 @@ function outPath = batch_preprocess_highPassNew(inPath, varargin)
     fileList = dir([inPath filesep '*.set']);
     for i=1:length(fileList)
         EEG = pop_loadset(fileList(i).name, inPath);
-        EEG = highPassNew(EEG, 'cutoff', cutoff);
+        EEG = highPassNew(EEG, varargin{:});
         save([outPath filesep fileList(i).name], 'EEG', '-v7.3');
     end    
 end

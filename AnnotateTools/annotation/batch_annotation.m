@@ -1,4 +1,8 @@
-%% 
+%% Estimate annotation scores using the annotator
+%  
+%  Parameters:
+%       inPat: the pash to the classification scores
+%       outPath: the path to the place where estimated scores are saved
 %
 function outPath = batch_annotation(inPath, varargin)
 
@@ -15,7 +19,6 @@ function outPath = batch_annotation(inPath, varargin)
 
     % go over all files and preprocess them using the specified function
     fileList = dir([inPath filesep '*.mat']);
-    
     for i=1:length(fileList)
         readData = load([inPath_test filesep fileList(i).name]);
         annotData = annotator(readData.scoreData, i, varargin{:});

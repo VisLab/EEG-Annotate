@@ -1,4 +1,8 @@
-%% 
+%% Extract average power feature from raw EEG data
+%  
+%  Parameters:
+%       inPat: the pash to the EEG datasets
+%       outPath: the path to the place where extracted features are saved
 %
 function outPath = batch_feature_averagePower(inPath, varargin)
 
@@ -15,7 +19,6 @@ function outPath = batch_feature_averagePower(inPath, varargin)
 
     % go over all files and preprocess them using the specified function
     fileList = dir([inPath filesep '*.set']);
-    
     for i=1:length(fileList)
         EEG = pop_loadset(fileList(i).name, inPath);
         [data, config, history] = averagePower(EEG, varargin{:});

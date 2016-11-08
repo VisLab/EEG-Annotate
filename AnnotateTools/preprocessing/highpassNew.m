@@ -1,7 +1,7 @@
 function EEG = highpassNew(EEG, varargin)
 % Perform highpass filtering
 % Parameters
-%     burstCriterion    Standard deviation cutoff for removal of bursts (Default: 5)
+%       cutoff: cutoff of the high pass filter (default: 1 Hz)
 try
     % Convert name-value pair parameters to structure   
     params = vargin2struct(varargin);  
