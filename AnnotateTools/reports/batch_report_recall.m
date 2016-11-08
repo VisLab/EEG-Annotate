@@ -11,12 +11,17 @@ function outPath = batch_report_recall(inPath, varargin)
     if isfield(params, 'outPath')
         outPath = params.outPath;
     end
-    timinigTolerance = 0:5;
-    if isfield(params, 'outPath')
-        timinigTolerance = params.timinigTolerance;
+    if isfield(params, 'targetClasses')
+        targetClasses = params.targetClasses;
+    else
+        error('Target class must be specified');
+    end
+    timinigTolerances = 0:5;
+    if isfield(params, 'timinigTolerances')
+        timinigTolerances = params.timinigTolerances;
     end
     retrieveNumbs = 100:100:1000;
-    if isfield(params, 'outPath')
+    if isfield(params, 'retrieveNumbs')
         retrieveNumbs = params.retrieveNumbs;
     end
    
@@ -30,13 +35,13 @@ function outPath = batch_report_recall(inPath, varargin)
     % go over all test sets and estimate scores
     testsetNumb = length(fileList);
     
-    averageRecalls = zeros(length(retrieveNumbs), testsetNumb, length(timinigTolerance)); % avrage precisions
+    averageRecalls = zeros(length(retrieveNumbs), testsetNumb, length(timinigTolerances)); % avrage precisions
     
     for r=1:length(retrieveNumbs)
         retrieveNumb = retrieveNumbs(r);
     
         for testSubjID=1:testsetNumb
-            load([inPath_test filesep fileList(testSubjID).name]); % load annotData
+            load([inPath filesep fileList(testSubjID).name]); % load annotData
             
             trueLabel = annotData.trueLabelOriginal{1};
             trueLabelBinary = zeros(size(trueLabel));
@@ -61,18 +66,25 @@ function outPath = batch_report_recall(inPath, varargin)
             if length(trueLabelBinary) ~= length(score)
                 error('data lengths are not matched');
             end
-            for tID = 1:length(t_tolerance)
-                tol = t_tolerance(tID);
+            for tID = 1:length(timinigTolerances)
+                tol = timinigTolerances(tID);
                 averageRecalls(r, testSubjID, tID) = evaluate_recall(trueLabelBinary, score, tol, retrieveNumb);
             end
         end
     end
+    outResults = squeeze(mean(averageRecalls, 2));
     
     saveName = 'target';
     for cID = 1:length(targetClasses)
         saveName = [saveName '_' targetClasses{cID}];
     end
     saveName = [saveName '_recall'];
-    save([outPath filesep saveName], 'averageRecalls', '-v7.3');
-    disp(squeeze(mean(averageRecalls, 2)));   % MAP (mean of average precision)    
+    save([outPath filesep saveName], 'averageRecalls', 'outResults', '-v7.3');
+    
+    disp('Report: recall');
+    disp('Parameter1: retrieveNumbs');
+    disp(retrieveNumbs);
+    disp('Parameter2: timing tolerance');
+    disp(timinigTolerances);
+    disp(outResults);   % MAP (mean of average precision)    
 end

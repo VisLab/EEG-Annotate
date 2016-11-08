@@ -25,7 +25,7 @@ function annotData = annotator(scoreData, selfIdx, varargin)
         weights = params.weights;
     end
 
-    trainsetNumb = length(scoreData);       % kyung: need check
+    trainsetNumb = length(scoreData.scoreStandard); 
     testSampleNumb = length(scoreData.trueLabelOriginal{1});
     excludeIdx = scoreData.excludeIdx{1};
     
@@ -55,7 +55,7 @@ function annotData = annotator(scoreData, selfIdx, varargin)
         sNew = sNew ./ cutMax;
         allScores = cat(1, allScores, sNew);
 
-        fprintf('trainSubj, %d, testSubj, %d\n', trainIdx, testSubjID);
+        fprintf('annotate, trainSubj, %d\n', trainIdx);
     end
     theseScores = sum(allScores, 1);   % sum of sub-window scores
     if sum(isnan(theseScores)) > 0

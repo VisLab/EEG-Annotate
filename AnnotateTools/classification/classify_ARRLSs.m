@@ -11,7 +11,7 @@ function scoreData = classify_ARRLSs(dataTest, inPath_train, varargin)
     if isfield(params, 'targetClass')
         targetClass = params.targetClass;
     else
-        error('Targget class must be specified');
+        error('Target class must be specified');
     end
     % ARRLS option
     options.p = 10;             % default
@@ -34,6 +34,10 @@ function scoreData = classify_ARRLSs(dataTest, inPath_train, varargin)
     if isfield(params, 'ker')
         options.ker = params.ker;
     end
+    fExcludeBoundaryInTest = false;
+    if isfield(params, 'fExcludeBoundaryInTest')
+        fExcludeBoundaryInTest = params.fExcludeBoundaryInTest;
+    end
 
     fileList_train = dir([inPath_train filesep '*.mat']);
     num_train = length(fileList_train);
@@ -44,14 +48,17 @@ function scoreData = classify_ARRLSs(dataTest, inPath_train, varargin)
     scoreData.predLabelBinary = cell(num_train, 1);
     scoreData.scoreStandard = cell(num_train, 1);
     scoreData.scoreOriginal = cell(num_train, 1);
-    scoreData.testName = testName;
 
-    testSamplePool = dataTest.testSamplePool;
-    testLabelOriginal = dataTest.testLabelOriginal;
-    excludeIdx = dataTest.excludeIdx;
-
-    scoreData.trueLabelOriginal{1} = testLabelOriginal;
+    testSamplePool = dataTest.samples;
+    scoreData.trueLabelOriginal{1} = dataTest.labels;
+    
+    if fExcludeBoundaryInTest == true
+        excludeIdx = dataTest.mask.indexOverlapBoundary;
+    else
+        excludeIdx = zeros(1, length(dataTest.mask.indexOverlapBoundary));
+    end
     scoreData.excludeIdx{1} = excludeIdx;
+    testSamplePool = testSamplePool(:, excludeIdx == 0);      % the size of samples and labels could be different.
 
     % go over all test files and estimate scores
     % In case of LDA, training loop is outer loop to avoid repeating of training classifiers.
@@ -73,13 +80,11 @@ function scoreData = classify_ARRLSs(dataTest, inPath_train, varargin)
 
         % convert the result formats to the standard format 
         %
-        % ARRLS retuns two scores for each class.
-        % First it z-scales scores so that they have same scales.
-        % Standard scores are defined as the difference of scaled scores.        
-        scores = zscore(scores);                % z-normalization scores for each class
-        scoreData.scoreStandard{trainIdx} = scores(:, 2) - scores(:, 1);   % score: target score - non-target score
+        % ARRLS retuns non-standard scores for each class.
+        % Standard scores are defined as the normalized difference.        
+        scoreData.scoreStandard{trainIdx} = zscore(scores(:, 2) - scores(:, 1));   % zscores(target score - non-target score)
 
-        fprintf('trainSubj, %d, testSubj, %d\n', trainIdx, testSubjID);
+        fprintf('ARRLS done, trainID, %d\n', trainIdx);
     end
 end
 

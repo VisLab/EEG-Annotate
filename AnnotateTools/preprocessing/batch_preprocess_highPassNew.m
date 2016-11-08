@@ -21,7 +21,7 @@ function outPath = batch_preprocess_highPassNew(inPath, varargin)
     fileList = dir([inPath filesep '*.set']);
     for i=1:length(fileList)
         EEG = pop_loadset(fileList(i).name, inPath);
-        EEG = highPassNew(EEG, varargin{:});
+        EEG = highpassNew(EEG, varargin{:});
         save([outPath filesep fileList(i).name], 'EEG', '-v7.3');
     end    
 end

@@ -20,7 +20,7 @@ function outPath = batch_annotation(inPath, varargin)
     % go over all files and preprocess them using the specified function
     fileList = dir([inPath filesep '*.mat']);
     for i=1:length(fileList)
-        readData = load([inPath_test filesep fileList(i).name]);
+        readData = load([inPath filesep fileList(i).name]);
         annotData = annotator(readData.scoreData, i, varargin{:});
         save([outPath filesep fileList(i).name], 'annotData', '-v7.3');
     end

@@ -3,6 +3,10 @@
 function recall = evaluate_recall(trueLabel, score, error, retrieveNumb)
     % error: ditance range 0 ~ 7, 8 means the fail of retrieval
     
+    if retrieveNumb > length(trueLabel)
+        retrieveNumb = length(trueLabel);
+        warning('too large retrieveNumb');
+    end
     [~, si] = sort(score, 'descend');
     predLabel = zeros(length(trueLabel), 1);
     predLabel(si(1:retrieveNumb)) = 1;
