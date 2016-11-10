@@ -2,6 +2,7 @@
 % 
 %  1) Cut subject 12 datasets into 600 seconds length
 %  2) Remove external channels because annotator uses only EEG channels
+%     External channel : the channel out of the head boundary. 
 %
 %  Parameters:
 %       inPat: the pash to the EEG datasets
