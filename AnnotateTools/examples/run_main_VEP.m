@@ -17,7 +17,9 @@ pop_editoptions('option_single', false, 'option_savetwofiles', false);
 
 %% 1) Preprocess
 %  Apply general preprocessings on the raw EEG data
-%  Do high pass filtering and remove artifacts using the ASR tool
+%  - Do PREP (including high pass filtering) 
+%  - The test dataset dedicated pre-processes such as fixing the data length of subject 12
+%  - Remove artifacts using the ASR tool
 batch_preprocess_PREP('Z:\Data 3\VEP\VEP_BIOSIMI', ...
              'outPath', '.\temp\PREP', ...
              'lineFrequencies', [60, 120, 180, 212, 240], ...
