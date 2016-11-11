@@ -21,7 +21,7 @@ function outPath = batch_feature_averagePower(inPath, varargin)
     fileList = dir([inPath filesep '*.set']);
     for i=1:length(fileList)
         EEG = pop_loadset(fileList(i).name, inPath);
-        [data, config, history] = averagePower(EEG, varargin{:});
-        save([outPath filesep fileList(i).name(1:end-4) '.mat'], 'data', 'config', 'history', '-v7.3');
+        [samples, labels] = averagePower(EEG, varargin{:});
+        save([outPath filesep fileList(i).name(1:end-4) '.mat'], 'samples', 'labels', '-v7.3');
     end
 end

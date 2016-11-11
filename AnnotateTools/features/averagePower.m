@@ -26,7 +26,7 @@
 %      step
 %    history: structure
 %
-function [data, config, history] = averagePower(EEG, varargin)
+function [samples, labels] = averagePower(EEG, varargin)
 try
     %Setup the parameters and reporting for the call   
     params = vargin2struct(varargin);  
@@ -99,12 +99,10 @@ try
     
     % fill the feature samples, labels, and times field
     % features = accumulated data of (bandPass filtered average power) 
-    [data.samples, data.labels, data.times, history.subbands] = getSampleFeatures(EEGintp, config);
+    [data.samples, data.labels, history.subbands] = getSampleFeatures(EEGintp, config);
 
-    % mask to exclude samples
-    % 1) end of samples
-    % 2) samples overlapped with boundary event
-    data.mask = excludeMask(data, EEGintp, config);
+    samples = data.samples;
+    labels = data.labels';
     
 catch mex
     errorMessages.averagePower = ['failed average power: ' getReport(mex)];
@@ -114,45 +112,7 @@ catch mex
 end
 end
 
-function mask = excludeMask(data, EEG, config)
-
-    sampleNumb = size(data.samples, 2);
-
-    mask.indexWithinBoundary = zeros(1, sampleNumb);
-    mask.indexOverlapBoundary = zeros(1, sampleNumb);
-    
-    mask.indexWithinBoundary(end-6:end) = 1; % end of samples. not enough sub-windows for one sample
-    
-    % event.latency in frames
-    % data.times in milliseconds
-    boundaryFlag = zeros(1, sampleNumb);
-    for e=1:length(EEG.event)
-        if strcmp(EEG.event(e).type, 'boundary')
-            beginBoundary = (EEG.event(e).latency / EEG.srate - config.step) * 1000; % begin of boundary in milliseconds
-            % to include the window of the boundary event, subtract one step. otherwise, the first sample in boundary is not flagged.
-            % data.times is the starting time of each window.
-            % if data.times is larger than the beginBoundary, it is excluded.
-            endBoundary = (EEG.event(e).latency + EEG.event(e).duration) / EEG.srate * 1000; % end of boundary in milliseconds
-            boundaryFlag((beginBoundary <= data.times) & (data.times <= endBoundary)) = 1;
-        end
-    end
-    
-    boundaryIdx = find(boundaryFlag);
-    mask.indexWithinBoundary(boundaryIdx) = 1;  % samples in boundary periods
-    
-    % to exclude overlapped samples
-    overlapIdx = [];
-    for offset = -7:7
-        overlapIdx = cat(2, overlapIdx, boundaryIdx+offset);
-    end
-    overlapIdx = unique(overlapIdx(:));
-    overlapIdx(overlapIdx < 1) = [];
-    overlapIdx(overlapIdx > sampleNumb) = [];
-    
-    mask.indexOverlapBoundary(overlapIdx) = 1;  % overlapped with boundary
-end
-
-function [sampleOut, labelOut, timeOut, historySubbands] = getSampleFeatures(EEGin, config)
+function [sampleOut, labelOut, historySubbands] = getSampleFeatures(EEGin, config)
 
     dataLength = size(EEGin.data, 2); 
     sRate = EEGin.srate;
@@ -214,8 +174,9 @@ function [sampleOut, labelOut, timeOut, historySubbands] = getSampleFeatures(EEG
             end
         end
     end
-    
-    timeOut = EEGin.times(1:subLengthFrame:end);  % a vector of the starting time (in milliseconds)
+   
+    sampleOut = sampleOut(:, 1:end-8);
+    labelOut = labelOut(1:end-8);
 end
 
 function label = getEventLabelInString(event)

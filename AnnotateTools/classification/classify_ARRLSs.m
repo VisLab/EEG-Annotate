@@ -34,32 +34,19 @@ function scoreData = classify_ARRLSs(dataTest, inPath_train, varargin)
     if isfield(params, 'ker')
         options.ker = params.ker;
     end
-    fExcludeBoundaryInTest = false;
-    if isfield(params, 'fExcludeBoundaryInTest')
-        fExcludeBoundaryInTest = params.fExcludeBoundaryInTest;
-    end
 
     fileList_train = dir([inPath_train filesep '*.mat']);
     num_train = length(fileList_train);
     
-    scoreData = struct('trueLabelOriginal', [], 'excludeIdx', [], 'predLabelBinary', [], 'scoreStandard', [], 'scoreOriginal', []);
+    scoreData = struct('trueLabelOriginal', [], 'predLabelBinary', [], 'scoreStandard', [], 'scoreOriginal', []);
     scoreData.trueLabelOriginal = cell(1, 1);
-    scoreData.excludeIdx = cell(1, 1);
     scoreData.predLabelBinary = cell(num_train, 1);
     scoreData.scoreStandard = cell(num_train, 1);
     scoreData.scoreOriginal = cell(num_train, 1);
 
     testSamplePool = dataTest.samples;
-    scoreData.trueLabelOriginal{1} = dataTest.labels;
+    scoreData.trueLabelOriginal = dataTest.labels;
     
-    if fExcludeBoundaryInTest == true
-        excludeIdx = dataTest.mask.indexOverlapBoundary;
-    else
-        excludeIdx = zeros(1, length(dataTest.mask.indexOverlapBoundary));
-    end
-    scoreData.excludeIdx{1} = excludeIdx;
-    testSamplePool = testSamplePool(:, excludeIdx == 0);      % the size of samples and labels could be different.
-
     % go over all test files and estimate scores
     % In case of LDA, training loop is outer loop to avoid repeating of training classifiers.
     % In case of ARRLS, the loop reading larger dataset is outer loop to reduce the reading overhead.

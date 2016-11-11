@@ -4,7 +4,7 @@
 % 
 function [samples, labels] = getTrainingData(dataPath, fileName, targetClass)
     
-    load([dataPath filesep fileName]);
+    data = load([dataPath filesep fileName]);
     
     targetIdx = zeros(length(data.labels), 1);
     for i=1:length(data.labels)

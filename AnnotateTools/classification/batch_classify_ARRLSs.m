@@ -20,8 +20,8 @@ function outPath = batch_classify_ARRLSs(inPath_test, inPath_train, varargin)
     % go over all files and preprocess them using the specified function
     fileList_test = dir([inPath_test filesep '*.mat']);
     for i=1:length(fileList_test)
-        loadData = load([inPath_test filesep fileList_test(i).name]);
-        scoreData = classify_ARRLSs(loadData.data, inPath_train, varargin{:});
+        testData = load([inPath_test filesep fileList_test(i).name]);
+        scoreData = classify_ARRLSs(testData, inPath_train, varargin{:});
         save([outPath filesep fileList_test(i).name], 'scoreData', '-v7.3');
     end
 end
