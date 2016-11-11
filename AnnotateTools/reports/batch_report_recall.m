@@ -43,7 +43,7 @@ function outPath = batch_report_recall(inPath, varargin)
         for testSubjID=1:testsetNumb
             load([inPath filesep fileList(testSubjID).name]); % load annotData
             
-            trueLabel = annotData.trueLabelOriginal{1};
+            trueLabel = annotData.trueLabelOriginal;
             trueLabelBinary = zeros(size(trueLabel));
 
             numbEvent = 0;
@@ -62,7 +62,7 @@ function outPath = batch_report_recall(inPath, varargin)
             fprintf('test subject, %d, has %d targets, in %d events, in %d samples\n', ...
                         testSubjID, sum(trueLabelBinary), numbEvent, length(trueLabel));
 
-            score = annotData.combinedScore{1};
+            score = annotData.combinedScore;
             if length(trueLabelBinary) ~= length(score)
                 error('data lengths are not matched');
             end

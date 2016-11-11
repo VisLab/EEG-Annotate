@@ -26,8 +26,9 @@ function annotData = annotator(scoreData, selfIdx, varargin)
     end
 
     trainsetNumb = length(scoreData.scoreStandard); 
-    testSampleNumb = length(scoreData.trueLabelOriginal{1});
-    excludeIdx = scoreData.excludeIdx{1};
+    testSampleNumb = length(scoreData.trueLabelOriginal);
+    excludeIdx = zeros(1, testSampleNumb); % for future extension
+    %excludeIdx = scoreData.excludeIdx{1};
     
     allScores = [];
     for trainIdx = 1:trainsetNumb
@@ -67,7 +68,7 @@ function annotData = annotator(scoreData, selfIdx, varargin)
     % Use a greedy algorithm to take best scores
     sNew = maskScores3(s, 7, fHighRecall);  % zero out 15 elements
 
-    scoreData.combinedScore{1} = sNew;
+    scoreData.combinedScore = sNew;
     
     annotData = scoreData;
 end
