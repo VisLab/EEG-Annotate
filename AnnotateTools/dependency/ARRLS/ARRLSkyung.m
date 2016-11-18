@@ -2,7 +2,7 @@
 % revised by Kyung
 % - remove print out statement
 % - return scores
-function [Acc,Cls,Alpha,Scores] = ARRLSkyung(Xs,Xt,Ys,Yt,options)
+function [Acc,Cls,Alpha,Scores,TrainScores] = ARRLSkyung(Xs,Xt,Ys,Yt,options)
 
 %% Load algorithm options
 addpath(genpath('.\liblinear\matlab'));
@@ -95,6 +95,7 @@ fprintf('>>Acc=%f\n',Acc);
 fprintf('Algorithm ARRLS terminated!!!\n\n');
 
 %% Kyung - return score
+TrainScores = F(1:n, :);
 Scores = F(n+1:end, :);
 %Scores = Scores(:, 2) - Scores(:, 1);  % difference between two columns
 

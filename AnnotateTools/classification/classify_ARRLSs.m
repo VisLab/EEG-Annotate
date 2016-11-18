@@ -34,15 +34,23 @@ function scoreData = classify_ARRLSs(dataTest, inPath_train, varargin)
     if isfield(params, 'ker')
         options.ker = params.ker;
     end
+    fSaveTrainScore = false;
+    if isfield(params, 'fSaveTrainScore')
+        fSaveTrainScore = params.fSaveTrainScore;
+    end
 
     fileList_train = dir([inPath_train filesep '*.mat']);
     num_train = length(fileList_train);
     
-    scoreData = struct('trueLabelOriginal', [], 'predLabelBinary', [], 'scoreStandard', [], 'scoreOriginal', []);
+    scoreData = struct('trueLabelOriginal', [], 'predLabelBinary', [], 'scoreStandard', [], 'scoreOriginal', [],...
+                        'trainLabel', [], 'trainScore', [], 'trainOriginalLength', []);
     scoreData.trueLabelOriginal = cell(1, 1);
     scoreData.predLabelBinary = cell(num_train, 1);
     scoreData.scoreStandard = cell(num_train, 1);
     scoreData.scoreOriginal = cell(num_train, 1);
+    scoreData.trainLabel = cell(num_train, 1);
+    scoreData.trainScore = cell(num_train, 1);
+    scoreData.trainOriginalLength = zeros(num_train, 1);
 
     testSamplePool = dataTest.samples;
     scoreData.trueLabelOriginal = dataTest.labels;
@@ -60,7 +68,7 @@ function scoreData = classify_ARRLSs(dataTest, inPath_train, varargin)
 
         % ARRLS calculates scores for each labels. If there are five labels, it will calculates 5 scores.
         % So make sure that there are only two labels in [trainLabel testLabel]
-        [~,predLabels,~,scores] = ARRLSkyung(double(trainSample), double(testSamplePool), trainLabel, testLabeltemp, options);
+        [~,predLabels,~,scores, trainScore] = ARRLSkyung(double(trainSample), double(testSamplePool), trainLabel, testLabeltemp, options);
 
         scoreData.predLabelBinary{trainIdx} = predLabels - 1;  % predicted label 0 or 1
         scoreData.scoreOriginal{trainIdx} = scores;
@@ -71,6 +79,12 @@ function scoreData = classify_ARRLSs(dataTest, inPath_train, varargin)
         % Standard scores are defined as the normalized difference.        
         scoreData.scoreStandard{trainIdx} = zscore(scores(:, 2) - scores(:, 1));   % zscores(target score - non-target score)
 
+        if fSaveTrainScore == true
+            scoreData.trainLabel{trainIdx} = trainLabel;
+            scoreData.trainScore{trainIdx} = trainScore;
+            scoreData.trainOriginalLength(trainIdx) = length(trainLabelPool);
+        end
+        
         fprintf('ARRLS done, trainID, %d\n', trainIdx);
     end
 end
