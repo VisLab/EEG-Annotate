@@ -4,7 +4,7 @@
 %       inPat: the pash to the data (samples and classes)
 %       outPath: the path to the place where estimated scores are saved
 %
-function outPath = batch_classify_ARRLSs(inPath_test, inPath_train, varargin)
+function outPath = batch_classify_ARTLimb(inPath_test, inPath_train, varargin)
 
     %Setup the parameters and reporting for the call   
     params = vargin2struct(varargin);  
@@ -21,7 +21,7 @@ function outPath = batch_classify_ARRLSs(inPath_test, inPath_train, varargin)
     fileList_test = dir([inPath_test filesep '*.mat']);
     for i=1:length(fileList_test)
         testData = load([inPath_test filesep fileList_test(i).name]);
-        scoreData = classify_ARRLSs(testData, inPath_train, varargin{:});
+        scoreData = classify_ARTLimbs(testData, inPath_train, varargin{:});
         save([outPath filesep fileList_test(i).name], 'scoreData', '-v7.3');
     end
 end

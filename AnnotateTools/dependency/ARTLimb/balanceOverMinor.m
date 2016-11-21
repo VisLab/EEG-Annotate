@@ -1,13 +1,21 @@
 function [samples, labels] = balanceOverMinor(samples, labels)
 	
     if ~isempty(samples) && ~isempty(labels)
-        indexClass0 = find(labels == 0);
-        indexClass1 = find(labels == 1);
+        classes = unique(labels);
+        
+        if length(classes) == 1
+            sampleNumb0 = length(labels);
+            sampleNumb1 = 0;
+        else
+            indexClass0 = find(labels == classes(1));
+            indexClass1 = find(labels == classes(2));
 
-        sampleNumb0 = length(indexClass0);
-        sampleNumb1 = length(indexClass1);
+            sampleNumb0 = length(indexClass0);
+            sampleNumb1 = length(indexClass1);
+        end
 
-        if (sampleNumb0 == 0) || (sampleNumb1 == 0)
+        % if only one class is given, add 10% of samples randomly
+        if (sampleNumb0 == 0) || (sampleNumb1 == 0) 
             warning('only one class');
             sampleNumb = sampleNumb0 + sampleNumb1;
             numAdd = round(sampleNumb / 10);
@@ -22,11 +30,9 @@ function [samples, labels] = balanceOverMinor(samples, labels)
             end
         end
 
-        %pickIndex = [indexClass0; indexClass1; addIndex];
-
-        %samples = samples(:, pickIndex);
-        %labels = labels(pickIndex);
         samples = cat(2, samples, samples(:, addIndex));
         labels = cat(1, labels, labels(addIndex));
+    else
+        error('empty data is given');
     end
 end
