@@ -36,7 +36,7 @@ function outPath = batch_report_RAP(inPath, varargin)
     for testSubjID=1:testsetNumb
         load([inPath filesep fileList(testSubjID).name]); % load annotData
 
-        trueLabel = annotData.trueLabelOriginal;
+        trueLabel = annotData.testLabel;
         trueLabelBinary = zeros(size(trueLabel));
 
         numbEvent = 0;

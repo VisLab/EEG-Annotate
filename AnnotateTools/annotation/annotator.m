@@ -12,9 +12,13 @@ function annotData = annotator(scoreData, selfIdx, varargin)
     if isfield(params, 'excludeSelf')
         excludeSelf = params.excludeSelf;
     end
-    fHighRecall = false;    
-    if isfield(params, 'fHighRecall')
-        fHighRecall = params.fHighRecall;
+    adaptiveCutoff = false;   % default: fixed cutoff 0.0 
+    if isfield(params, 'adaptiveCutoff')
+        adaptiveCutoff = params.adaptiveCutoff;
+    end
+    rescaleBeforeCombining = true;  
+    if isfield(params, 'rescaleBeforeCombining')
+        rescaleBeforeCombining = params.rescaleBeforeCombining;
     end
     position = 8;     
     if isfield(params, 'position')
@@ -25,50 +29,86 @@ function annotData = annotator(scoreData, selfIdx, varargin)
         weights = params.weights;
     end
 
-    trainsetNumb = length(scoreData.scoreStandard); 
-    testSampleNumb = length(scoreData.trueLabelOriginal);
-    excludeIdx = zeros(1, testSampleNumb); % for future extension
-    %excludeIdx = scoreData.excludeIdx{1};
+    trainsetNumb = length(scoreData.testFinalScore); 
+    
+    for trainIdx = 1:trainsetNumb
+        if (excludeSelf == true) && (selfIdx == trainIdx)
+            continue;
+        end
+        rawScore = scoreData.testFinalScore{trainIdx};
+
+        % calculate weighted sub-windows scores
+        wScore = getWeightedScore(rawScore, weights, position);
+
+        if adaptiveCutoff == true
+            cutoff = getCutoff_FL(wScore);
+        else
+            cutoff = 0.0;
+        end
+                
+        % Use a greedy algorithm to take best scores
+        mScore = getMaskOutScore(wScore, 7, cutoff);  % mask out 15 elements         
+
+        scoreData.wmScore{trainIdx} = mScore; % weighted and mask-out score
+    end
     
     allScores = [];
     for trainIdx = 1:trainsetNumb
         if (excludeSelf == true) && (selfIdx == trainIdx)
             continue;
         end
-        rawScore = zeros(1, testSampleNumb);
-        rawScore(excludeIdx == 0) = scoreData.scoreStandard{trainIdx};
+        
+        wmScore = scoreData.wmScore{trainIdx};
 
-        % calculate weighted scores
-        s = rescore3(rawScore, weights, position, excludeIdx);
+        if rescaleBeforeCombining == true
+            % How to scale scores?
+            % 1) 2)
+%             cutPrecentage = 95; cutMax = 0;
+%             while (cutMax == 0)
+%                 cutMax = prctile(wmScore, cutPrecentage);
+%                 cutPrecentage = cutPrecentage + 1;
+%             end
 
-        % Use a greedy algorithm to take best scores
-        sNew = maskScores3(s, 7, fHighRecall);  % zero out 15 elements         
+            % 3) 4)
+%             cutPrecentage = 95; cutMax = 0;
+%             nonZeroScore = wmScore(wmScore > 0);
+%             while (cutMax == 0)
+%                 cutMax = prctile(nonZeroScore, cutPrecentage);
+%                 cutPrecentage = cutPrecentage + 1;
+%             end
+            
+            % 5-8)
+            nonZeroScore = wmScore(wmScore > 0);
+            cutMax = mean(nonZeroScore); % - (1 * std(nonZeroScore));
+          
+            wmScore(wmScore > cutMax) = cutMax;
+            wmScore = wmScore ./ cutMax;
 
-        % weighted score. note that it has the same length to true labels    
-        scoreData.weightedScore{trainIdx} = sNew;
-
-        cutPrecentage = 95; cutMax = 0;
-        while (cutMax == 0)
-            cutMax = prctile(sNew, cutPrecentage);
-            cutPrecentage = cutPrecentage + 1;
+            % 9)
+%             wmScore(wmScore > 0) = 1;
+            
         end
-        sNew(sNew > cutMax) = cutMax;
-        sNew = sNew ./ cutMax;
-        allScores = cat(1, allScores, sNew);
-
-        fprintf('annotate, trainSubj, %d\n', trainIdx);
+        allScores = cat(2, allScores, wmScore);
     end
-    theseScores = sum(allScores, 1);   % sum of sub-window scores
+    scoreData.allScores = allScores;
+    
+    theseScores = mean(allScores, 2);   % sum of sub-window scores
     if sum(isnan(theseScores)) > 0
         error('nan score');
     end
     % Make up a weighting and calculate weighted scores
-    s = rescore3(theseScores, weights, position, excludeIdx);% don't exclude negative scores
+    wScore = getWeightedScore(theseScores, weights, position);% don't exclude negative scores
 
+    if adaptiveCutoff == true
+        cutoff = getCutoff_FL(wScore);
+    else
+        cutoff = 0.5;
+    end
+    
     % Use a greedy algorithm to take best scores
-    sNew = maskScores3(s, 7, fHighRecall);  % zero out 15 elements
+    mScore = getMaskOutScore(wScore, 7, cutoff);  % mask out 15 elements         
 
-    scoreData.combinedScore = sNew;
+    scoreData.combinedScore = mScore;
     
     annotData = scoreData;
 end
