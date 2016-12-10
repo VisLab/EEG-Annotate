@@ -71,8 +71,8 @@ function [finalScore, finalCutoff, initProb, initCutoff, trainScore] = ARRLS_imb
     if optionIMB.AC1 == false   % if adaptive cutoff flag is off
         initCutoff = 0.5;
     elseif optionIMB.AC1 == true  % estimate cutoff by fitting
-        initCutoff = getCutoff_FL(initProb);
-        %[initCutoff, mu1, sigma1, mu2, sigma2, xgrid] = getCutoff_FL(initProb);
+        initCutoff = getCutoff_FL(initProb, 30, 0.5);
+        %[initCutoff, mu1, sigma1, mu2 , sigma2, xgrid] = getCutoff_FL(initProb);
     else
         error('unsupported adaptive cutoff option');
     end
@@ -199,7 +199,7 @@ function [finalScore, finalCutoff, initProb, initCutoff, trainScore] = ARRLS_imb
     if optionIMB.AC2 == false   % if adaptive cutoff flag is off
         finalCutoff = 0.0;
     elseif optionIMB.AC2 == true  % best cutoff
-        finalCutoff = getCutoff_FL(finalScore);
+        finalCutoff = getCutoff_FL(finalScore, 30, 0.0);
     else
         error('unsupported adaptive cutoff option');
     end

@@ -5,7 +5,7 @@
 %
 % When height is about 0.6065 x (max height), the x = center + sigma or center - sigma.
 % Assumption: the minor (positive) class has the higher score than the major (negative) class
-function [cutOff, mu1, sigma1, mu2, sigma2, xgrid] = getCutoff_FL(X)
+function [cutOff, mu1, sigma1, mu2, sigma2, xgrid] = getCutoff_FL(X, maxLoop, cutOffdefault)
 
     sigmaG = std(X); % global sigma
     
@@ -52,8 +52,9 @@ function [cutOff, mu1, sigma1, mu2, sigma2, xgrid] = getCutoff_FL(X)
     y1 = y1 * peak_y / max(y1);
 	
     wFlag = true;
+    m = 0;
     adjustFactor = 1;
-    while wFlag
+    while (wFlag && (m<maxLoop))
         y1 = y1 * adjustFactor;
 
         newCount = counts' - y1;
@@ -66,11 +67,18 @@ function [cutOff, mu1, sigma1, mu2, sigma2, xgrid] = getCutoff_FL(X)
             wFlag = false;
         end
         adjustFactor = adjustFactor * 0.9;
+        m = m + 1;
     end
     
-    [mu2, sigma2] = myStat(xgrid, newCount);
-    
-    cutOff = mu1 + (mu2 - mu1) * (sigma1 / (sigma1 + sigma2));
+    if m == maxLoop
+        warning('reach to maxLoop');
+        mu2 = [];
+        sigma2 = [];
+        cutOff = cutOffdefault;
+    else
+        [mu2, sigma2] = myStat(xgrid, newCount);
+        cutOff = mu1 + (mu2 - mu1) * (sigma1 / (sigma1 + sigma2));
+    end
 end
 
 % get mean and std of the histogram

@@ -30,15 +30,23 @@ function outPath = batch_plot_allPredictions(inPath, varargin)
     end
    
     plotClasses_str = [];
-    for i=1:length(plotClasses)
-        plotClasses_str = strcat(plotClasses_str,  '_', num2str(plotClasses{i}));
+    tempClasses = sort(plotClasses(:));
+    for i=1:length(tempClasses)
+        plotClasses_str = strcat(plotClasses_str,  '_', num2str(tempClasses{i}));
     end
     
+    eventColorMap = [0, 0, 1;   % blue
+                     0, 1, 0;   % green
+                     1, 0, 0];   % red
     if fBinary == true
         outPath = [outPath '_binary_length_' num2str(plotLength) '_markEvent' plotClasses_str];
-    else
+        scoreColorMap = [1, 1, 1
+              0, 0, 0];
+    else % grey
         outPath = [outPath '_gray_length_' num2str(plotLength) '_markEvent' plotClasses_str];
+        scoreColorMap = 1 - gray(256);
     end
+    userColorMap = cat(1, scoreColorMap, eventColorMap);
     
     if ~isdir(outPath)   % if the directory is not exist
         mkdir(outPath);  % make the new directory
@@ -54,41 +62,45 @@ function outPath = batch_plot_allPredictions(inPath, varargin)
         load([inPath filesep fileList(testSubjID).name]); % load annotData
 
         trueLabel = annotData.testLabel;
-        trueLabelBinary = zeros(size(trueLabel));
+        trueLabelBinary = zeros(length(trueLabel), 2);
 
         for s=1:length(trueLabel)
             if ~isempty(trueLabel{s})
                 for i1=1:length(trueLabel{s})
-                    for i2=1:length(plotClasses)
-                        if strcmp(trueLabel{s}{i1}, plotClasses{i2})
-                            trueLabelBinary(s) = 1;
+                    for i2=1:2
+                        for i3=1:size(plotClasses, 2)
+                            if strcmp(trueLabel{s}{i1}, plotClasses{i2,i3})
+                                if trueLabelBinary(s, i2) ~= 0
+                                    warning('True event is overwritten');
+                                end
+                                trueLabelBinary(s, i2) = i3;
+                            end
                         end
                     end
                 end
             end
         end
-
-        yTickLabels = {'(Test)'};
+        allScores = annotData.allScores;
+        eventIdx = (trueLabelBinary>0);
+        if fBinary == true
+            allScores(allScores > 0) = 1;
+            trueLabelBinary(eventIdx) = trueLabelBinary(eventIdx) + 2;
+        else % grey
+            allScores = round(allScores * 255);  % 256 grey 
+            trueLabelBinary(eventIdx) = trueLabelBinary(eventIdx) + 256;
+        end
+        plotTemp = [trueLabelBinary allScores];
+        
+        yTickLabels = {'(Response)'};
+        yTickLabels{2} = '(Image)';
         for trainID = 1:size(annotData.allScores, 2)
-            yTickLabels{trainID+1} = ['' num2str(trainID)];
+            yTickLabels{trainID+2} = ['' num2str(trainID)];
         end
         fH = figure(1);  clf;
         set(fH, 'Position', [200, 310, 1580, 420]);
-        plotTemp = [trueLabelBinary annotData.allScores];
-        if fBinary == true
-            plotTemp(plotTemp > 0) = 1;
-        else
-            plotTemp = round(plotTemp * 255);  % 256 grey 
-        end
-        imagesc(plotTemp');
+        image(plotTemp');
         axis xy;
-        if fBinary == true
-            map = [1, 1, 1
-                  0, 0, 0];
-        else % grey
-            map = 1 - gray(256);
-        end
-        colormap(map);	
+        colormap(userColorMap);	
         set(gca, 'YTick', (1:18));     set(gca, 'YTickLabel', yTickLabels);
         %set(gca, 'XTick', 480:80:960);  set(gca, 'XTickLabel', {'60', '70', '80', '90', '100', '110', '120'});
         set(gca, 'Ticklength', [0 0]);
