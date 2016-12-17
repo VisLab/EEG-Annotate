@@ -85,8 +85,15 @@ function outPath = batch_plot_true_in_wing(inPath, varargin)
         xlabel('Time (8 intervals / 1 second)');
         ylabel('Samples (sorted by scores)');
         title(['Subject ' num2str(testSubjID) ', ' titleStr], 'Interpreter', 'none');
+        fileName = ['testSubject' num2str(testSubjID, '%02d') '_' titleStr];
+        saveas(hf1, [outPath filesep fileName '.fig']);
         img = getframe(hf1);
-        imwrite(img.cdata, [outPath filesep ['testSubject' num2str(testSubjID, '%02d') '_' titleStr '.png']]);
+        imwrite(img.cdata, [outPath filesep fileName '.png']);
+        centerData = sortData(:, offPast+1);
+        fprintf('(Breakdown of predicted positives) subj, %d, %d, %d, %d, %d, %d, %d, %d, %d\n', ...
+            testSubjID, ...
+            sum(centerData==1), sum(centerData==2), sum(centerData==3), sum(centerData==4), ...
+            sum(centerData==5), sum(centerData==6), sum(centerData==7), sum(centerData==8));
     end
 end    
 

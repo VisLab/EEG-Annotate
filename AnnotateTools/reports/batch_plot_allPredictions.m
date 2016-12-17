@@ -29,6 +29,8 @@ function outPath = batch_plot_allPredictions(inPath, varargin)
         fBinary = params.fBinary;
     end
    
+    tenSeconds = 10 * (1 / sampleSize);
+    
     plotClasses_str = [];
     tempClasses = sort(plotClasses(:));
     for i=1:length(tempClasses)
@@ -92,27 +94,37 @@ function outPath = batch_plot_allPredictions(inPath, varargin)
         plotTemp = [trueLabelBinary allScores];
         
         yTickLabels = {'(Response)'};
-        yTickLabels{2} = '(Image)';
+        yTickLabels{2} = '(Stimulus)';
         for trainID = 1:size(annotData.allScores, 2)
             yTickLabels{trainID+2} = ['' num2str(trainID)];
         end
+        
+        XTicks = 1:tenSeconds:size(allScores, 1);
+        XTickLabels = {'0'};
+        for t=2:length(XTicks)
+           XTickLabels{t} = num2str((t-1)*10);     
+        end
+        
         fH = figure(1);  clf;
         set(fH, 'Position', [200, 310, 1580, 420]);
         image(plotTemp');
         axis xy;
         colormap(userColorMap);	
-        set(gca, 'YTick', (1:18));     set(gca, 'YTickLabel', yTickLabels);
-        %set(gca, 'XTick', 480:80:960);  set(gca, 'XTickLabel', {'60', '70', '80', '90', '100', '110', '120'});
+        set(gca, 'YTick', (1:19));     set(gca, 'YTickLabel', yTickLabels);
+        set(gca, 'XTick', XTicks);  set(gca, 'XTickLabel', XTickLabels);
         set(gca, 'Ticklength', [0 0]);
         ylabel(['Training subjects 1-' num2str(size(annotData.allScores, 2))]);
-        xlabel('Samples');     %xlabel('Seconds');     
+        xlabel('Seconds');     
+        ylim([1.5 19.5]);  % to exclude response events
         beginFrame = 1;
         endFrame = beginFrame + plotLength - 1;
         while(beginFrame < size(plotTemp, 1))
             xlim([beginFrame endFrame]);
             title(['Predicted scores by 17 training subjects for the test subject ' num2str(testSubjID) ', frame: ' num2str(beginFrame) '-' num2str(endFrame)]);
-            img = getframe(gcf);
-            imwrite(img.cdata, [outPath filesep ['testSubject' num2str(testSubjID, '%02d') '_f' num2str(beginFrame, '%04d') '.png']]);
+            fileName = ['testSubject' num2str(testSubjID, '%02d') '_f' num2str(beginFrame, '%04d')];
+            saveas(fH, [outPath filesep fileName '.fig']);
+            img = getframe(fH);
+            imwrite(img.cdata, [outPath filesep fileName '.png']);
             beginFrame = beginFrame + plotLength;
             endFrame = endFrame + plotLength;
         end

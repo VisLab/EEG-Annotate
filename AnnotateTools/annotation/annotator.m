@@ -41,7 +41,7 @@ function annotData = annotator(scoreData, selfIdx, varargin)
         wScore = getWeightedScore(rawScore, weights, position);
 
         if adaptiveCutoff == true
-            cutoff = getCutoff_FL(wScore);
+            cutoff = getCutoff_FL(wScore, 30, 0.0);
         else
             cutoff = 0.0;
         end
@@ -100,7 +100,7 @@ function annotData = annotator(scoreData, selfIdx, varargin)
     wScore = getWeightedScore(theseScores, weights, position);% don't exclude negative scores
 
     if adaptiveCutoff == true
-        cutoff = getCutoff_FL(wScore);
+        cutoff = getCutoff_FL(wScore, 30, 0.5);
     else
         cutoff = 0.5;
     end

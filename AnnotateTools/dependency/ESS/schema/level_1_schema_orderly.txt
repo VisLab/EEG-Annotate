@@ -1,0 +1,168 @@
+// description of ESS Level 1 JSON Schema in Orderly format: http://orderly-json.org
+
+object {
+string title;
+string type ["ess:StudyLevel1"]; // added to XML
+string essVersion;
+
+string {1, 120}  shortDescription;
+
+string dateCreated; // added to XML, based on PROV ontology
+string dateModified; // added to XML, based on PROV ontology
+string {32, } id; // added to XML, replaced uuid. Should start with ess:study/[study title with spaces replaced by _]/ and then some unique uuid.
+string DOI; // many new repositories give you a DOI for your study
+
+string description;
+string rootURI;
+
+array [
+     object {
+          string organization;
+          string grantId;
+     }
+] projectFunding;  // changed from XML
+
+array [
+    object{
+        string recordingParameterSetLabel;
+        array [
+           object {
+                string type;
+                number{0,}  samplingRate;
+                string name;
+                string description;
+                integer {1,} startChannel;
+                integer {1,} endChannel;
+                string subjectInSessionNumber;
+                string referenceLocation;
+                string referenceLabel;
+                string channelLocationType;
+                array [
+string
+    ] channelLabels;
+                array [
+		string
+    ] nonScalpChannelLabels;
+            }
+        ] modalities; // changed from XML, <channelType> removed
+    }
+
+]  recordingParameterSets; // changed from XML
+
+array [
+    object{
+        string "number";
+        string labId;
+        array [
+          object {
+            string labId;
+            string inSessionNumber;
+            string group;
+            string gender;
+            string YOB;
+            string age;
+            string hand;
+            string vision ["Normal", "CorrectedToNormal", "Impaired", "NA", "-", " "];
+            string hearing ["Normal", "CorrectedToNormal", "Impaired", "NA", "-", " "];
+            string height;
+            string weight;
+            object{
+              string caffeine;
+              string alcohol;
+            }* medication;
+            string channelLocationFile;
+          }*
+        ] subjects; // name changed from subject to subjects since it is an array.
+
+	object {
+          string text;
+          string linkLabel;
+          string link;
+        } note;
+
+        array[
+          object{
+            array [
+              string
+            ] taskLabels;
+            string filename;
+            string dataRecordingId; // should be ess:recording/ and then a uniuqe uuid
+            string startDateTime;
+            string recordingParameterSetLabel;
+            string eventInstanceFile;
+            string originalFileNameAndPath;
+          }
+        ] dataRecordings;
+    }*
+] sessions; // changed from XML, <session> removed.
+
+array [
+  object {
+    string taskLabel;
+    string tag;
+    string description;
+  }
+] tasks;
+
+string eventSpecificationMethod ["Codes", "Tags"];
+string isInEssContainer ["Yes", "No"];
+string hedVersion;
+array [
+  object {
+    string code;
+    integer {-1,} numberOfInstances; // -1 means that the value is unavailable.
+    string taskLabel;
+    string description;
+    string label;
+    string tag;
+  }
+] eventCodes; // changed from XML, <condition> and <event> removed
+
+object {
+  string totalSize;
+
+  object {
+    string type;
+    string text;
+    string link;
+  } license;
+
+  string allSubjectsHealthyAndNormal ["Yes", "No"];
+} summary;
+
+array [
+  object {
+    string citation;
+    string DOI;
+    string link;
+  }
+] publications;
+
+array [
+  object {
+     string givenName; // Given name. In the U.S., the first name of a Person. This can be used along with familyName instead of the name property.
+     string familyName; // Family name. In the U.S., the last name of an Person. This can be used along with givenName instead of the name property.
+     string additionalName; // An additional name for a Person, can be used for a middle name.
+    string role;
+  }
+] experimenters;
+
+object{
+  string givenName; // Given name. In the U.S., the first name of a Person. This can be used along with familyName instead of the name property.
+  string familyName; // Family name. In the U.S., the last name of an Person. This can be used along with givenName instead of the name property.
+  string additionalName; // An additional name for a Person, can be used for a middle name.
+  string phone;
+  string email;
+} contact; //point of contact
+
+array [
+  object {
+    string "name";
+    string logoLink;
+  }*
+] organizations; // changed from XML, made an array to cover cases with multiple organizations.
+
+string copyright;
+string IRB;
+
+}*

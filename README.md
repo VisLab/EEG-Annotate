@@ -11,4 +11,6 @@ Tools for annotating continuous EEG signals
 - run an example script (tested with MATLAB R2015a)
 
 # Example scripts
-  run_main.m under /AnnotateTools/examples/
+  *.m under /AnnotateTools/examples/
+  run_type1_ : training data is VEP dataset, test data is VEP dataset
+  run_type2_ : training data is VEP dataset, test data is Driving dataset

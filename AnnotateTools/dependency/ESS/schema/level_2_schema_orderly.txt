@@ -1,0 +1,94 @@
+// description of ESS Level 2 JSON Schema in Orderly format: http://orderly-json.org
+
+object {
+string title;
+string type ["ess:StudyLevel2"]; // added to XML
+string studyLevel2SchemaVersion;
+
+string dateCreated; // added to XML, based on PROV ontology
+string dateModified; // added to XML, based on PROV ontology
+string {32, } id; // added to XML, replaced uuid. Should start with ess:study/[study title with spaces replaced by _]/ and then some unique uuid.
+string DOI; // many new repositories give you a DOI for your study
+
+string rootURI;
+
+array [
+     object {
+          string filterLabel;
+          string filterDescription;
+          array [
+               integer
+          ] executionOrder;
+
+        string softwareEnvironment;
+        string softwarePackage;
+        string functionName;
+        string filterDescription;
+        string codeHash; // MDF5 hash of the function code
+        array [
+          object {
+            string name;
+            any value;
+          }
+        ] parameters;
+        string recordingParameterSetLabel;
+	  }
+] filters;  // changed from XML, no <filter> node inside
+
+
+array [
+  object{
+     string studyLevel2FileName;
+     string dataRecordingId; // changed the name from dataRecordingUuid in XML
+     string id; // changed from uuid
+     string noiseDetectionResultsFile;
+     string eventInstanceFile;
+     string reportFileName;
+     array [
+        integer
+     ] averageReferenceChannels;
+     array [
+        integer
+     ] rereferencedChannels;
+     array [
+        integer
+     ] interpolatedChannels;
+     string dataQuality ["Good", "Suspect", "Unusable"];
+  }
+] studyLevel2Files; // changed from XML, removed the studyLevel2File node inside
+
+object {
+// all level 1 ESS goes here
+}* studyLevel1;
+
+string totalSize;
+
+object {
+  string type;
+  string text;
+  string link;
+} license;
+
+object{
+  string givenName; // Given name. In the U.S., the first name of a Person. This can be used along with familyName instead of the name property.
+  string familyName; // Family name. In the U.S., the last name of an Person. This can be used along with givenName instead of the name property.
+  string additionalName; // An additional name for a Person, can be used for a middle name.
+  string phone;
+  string email;
+} contact; //point of contact
+
+array [
+  object {
+    string "name";
+    string logoLink;
+  }*
+] organizations; // changed from XML, made an array to cover cases with multiple organizations.
+
+array [
+     object {
+          string organization;
+          string grantId;
+     }
+] projectFunding;  // changed from XML
+
+}*
