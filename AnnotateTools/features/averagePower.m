@@ -82,11 +82,14 @@ try
             [newCh, originalCh] = getCommonChannel(newchanlocs, EEGonly.chanlocs);
             if isequal(newCh, originalCh)  % if two headsets are same
                 EEGintp = EEGonly; % EEG of target headset = EEG of orginal headset
+                warning('It use the headset same to the target one');
             else % if two headsets are not same
                 EEGintp = interpmont(EEGonly, config.headset, 'nfids', 0);  % interpolate EEG data for new headset
+                warning('Interpolate data for the new headset');
             end
         elseif length(newchanlocs) < length(EEGonly.chanlocs)  % 256 channel headset
             EEGintp = interpmont(EEGonly, config.headset, 'nfids', 0);  % interpolate EEG data for new headset
+            warning('Interpolate data for the new headset');
 %             [newCh, originalCh] = getCommonChannel(newchanlocs, EEGonly.chanlocs); % I was trying to use overlapped channels, but there were only 9 overlapped channels.
 %             EEGint = EEGonly;
 %             EEGint.nbchan = length(newchanlocs);
@@ -94,6 +97,7 @@ try
 %             EEGint.chanlocs(newCh) = EEGonly.chanlocs(originalCh);
         else   % lower density
             EEGintp = interpmont(EEGonly, config.headset, 'nfids', 0);  % interpolate EEG data for new headset
+            warning('Interpolate data for the new headset');
         end
     end
     

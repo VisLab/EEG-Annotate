@@ -22,6 +22,18 @@ function outPath = batch_annotation(inPath, varargin)
     for i=1:length(fileList)
         readData = load([inPath filesep fileList(i).name]);
         annotData = annotator(readData.scoreData, i, varargin{:});
-        save([outPath filesep fileList(i).name], 'annotData', '-v7.3');
+        try 
+            fileName = [outPath filesep fileList(i).name];
+            save(fileName, 'annotData', '-v7.3');
+        catch ME
+            if strcmp(ME.identifier, 'MATLAB:save:unableToWriteToMatFile') % if filename is too long
+                annotData.originalFileName = fileList(i).name;
+                fileName = [outPath filesep 'file_' num2str(i, '%02d') '.mat'];
+                save(fileName, 'annotData', '-v7.3');
+                fprintf('file_%02d.mat <== %s\n', i, fileList(i).name);
+            else
+                rethrow(ME);
+            end
+        end
     end
 end
