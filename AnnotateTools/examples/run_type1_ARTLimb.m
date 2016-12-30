@@ -17,7 +17,7 @@ clear; close all;
 % 0) Parameters
 pathIn = 'Z:\Data 3\VEP\VEP_PrepClean_Infomax';   % it is already PREP and ICA processed, otherwise I need to run PREP and ICA
 pathTemp = 'D:\temp';
-pathOutput = '.\output_type1_ARTLimb_34';  % '35'
+pathOutput = '.\output\type1_ARTLimb_34';  % '35'
 trainTargetClass = '34';  % '35'
 testTargetClasses = {'34'};  % '35'
 className = 'Friend';  % 'Foe'

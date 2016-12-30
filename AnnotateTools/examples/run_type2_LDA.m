@@ -18,10 +18,10 @@ clear; close all;
 pathInTrain = 'Z:\Data 3\VEP\VEP_PrepClean_Infomax';   % it is already PREP and ICA processed, otherwise I need to run PREP and ICA
 pathInTest = 'Z:\Data 3\BCIT_ESS\BCIT_ESS_256Hz_0p5Hz_Cleaned_ICA_Extended';   
 pathTemp = 'D:\temp';
-pathOutput = '.\output_type2_LDA_34';  % '35'
-trainTargetClass = '34';  % '35'
-testTargetClasses = {'34'};  % '35'
-className = 'Friend';  % 'Foe'
+pathOutput = '.\output\type2_LDA_35';  % 34, 35
+trainTargetClass = '35';  % 34, 35
+testTargetClasses = {'35'};  % 34, 35
+className = 'Foe';  % Friend, Foe
 
 experimentName = 'Experiment X6 Speed Control';
 level2File = 'studyLevelDerived_description.xml';
