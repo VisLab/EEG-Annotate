@@ -1,8 +1,12 @@
-%% Generate reports using the recall metric
+%% Generate reports using the Ranked Average Precision (RAP) metric
 %  Parameters:
 %       inPat: the pash to the annotation scores
 %       outPath: the path to the place where the generated report is saved
 %
+%  ex) batch_report_RAP([pathOutput filesep 'annotScore'], ...
+%       'outPath', [pathOutput filesep 'report'], ...
+%       'targetClasses', testTargetClasses, ...   % hit if it is any one of these class
+%       'timinigTolerances', 0:7);
 function outPath = batch_report_RAP(inPath, varargin)
 
     %Setup the parameters and reporting for the call   

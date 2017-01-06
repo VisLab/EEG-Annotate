@@ -11,6 +11,13 @@ Tools for annotating continuous EEG signals
 - run an example script (tested with MATLAB R2015a)
 
 # Example scripts
-  *.m under /AnnotateTools/examples/
-  run_type1_ : training data is VEP dataset, test data is VEP dataset
-  run_type2_ : training data is VEP dataset, test data is Driving dataset
+  run_typeX_classifierY.m under /AnnotateTools/examples/
+  
+  typeX: 
+		type1: training data is VEP dataset, test data is VEP dataset
+		type2: training data is VEP dataset, test data is Driving dataset
+  classifierY:
+		LDA: Linear Discriminant Analysis
+		ARTLorg: Adaptation Regualization based Transfer Learning (ARTL) by Long et al.
+		ARTLimb: ARTL classifier modified to handle imbalance
+

@@ -9,9 +9,6 @@ try
     ch_exclude = 1:length(EEGin.chanlocs);
     ch_exclude(ch_ica) = [];
     
-%     exFlag = ones(length(EEGin.chanlocs), 1);
-%     exFlag(ch_ica) = 0;
-%     ch_exclude = find(exFlag==1);
     EEGica = pop_select(EEGin, 'channel', ch_ica);    % exclude non-ica channels
     
     % clean EEG using MARA

@@ -27,6 +27,7 @@ function outPath = batch_annotation(inPath, varargin)
             save(fileName, 'annotData', '-v7.3');
         catch ME
             if strcmp(ME.identifier, 'MATLAB:save:unableToWriteToMatFile') % if filename is too long
+                delete(fileName);      % remove the error file
                 annotData.originalFileName = fileList(i).name;
                 fileName = [outPath filesep 'file_' num2str(i, '%02d') '.mat'];
                 save(fileName, 'annotData', '-v7.3');

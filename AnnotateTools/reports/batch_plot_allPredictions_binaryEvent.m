@@ -102,9 +102,15 @@ function outPath = batch_plot_allPredictions_binaryEvent(inPath, varargin)
            XTickLabels{t} = num2str((t-1)*10);     
         end
         
+        nRow = size(plotTemp, 2);
+        heightAxis = nRow * 10;
+        heightFigure = heightAxis + 220;
+        
         fH = figure(1);  clf;
-        set(fH, 'Position', [200, 310, 1580, 420]);
+        set(fH, 'Position', [50, 300, 1600, heightFigure]);
         image(plotTemp');
+        set(gca, 'Unit', 'points');
+        set(gca, 'Position', [100, 40, 1000, heightAxis]);
         axis xy;
         colormap(userColorMap);	
         set(gca, 'YTick', (1:length(yTickLabels)));     set(gca, 'YTickLabel', yTickLabels);
@@ -119,7 +125,7 @@ function outPath = batch_plot_allPredictions_binaryEvent(inPath, varargin)
             xlim([beginFrame endFrame]);
             title(['Predicted scores by ' num2str(size(annotData.allScores, 2)) ' training subjects for the test subject ' num2str(testSubjID) ', frame: ' num2str(beginFrame) '-' num2str(endFrame)]);
             fileName = ['testSubject' num2str(testSubjID, '%02d') '_f' num2str(beginFrame, '%04d')];
-            saveas(fH, [outPath filesep fileName '.fig']);
+            %saveas(fH, [outPath filesep fileName '.fig']);
             img = getframe(fH);
             imwrite(img.cdata, [outPath filesep fileName '.png']);
             beginFrame = beginFrame + plotLength;

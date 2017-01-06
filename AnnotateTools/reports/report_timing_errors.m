@@ -1,7 +1,7 @@
 %% Pairwise classification accuracy
 %
-% report_timing_errors('..\examples\output_type1_LDA_34\annotScore', 'LDA', '..\examples\output_type1_ARTLorg_34\annotScore', 'ARTL', '..\examples\output_type1_ARTLimb_34\annotScore', 'ARTLimb', '34', '.\timingError', 8);
-% report_timing_errors('..\examples\output_type1_LDA_35\annotScore', 'LDA', '..\examples\output_type1_ARTLorg_35\annotScore', 'ARTL', '..\examples\output_type1_ARTLimb_35\annotScore', 'ARTLimb', '35', '.\timingError', 8);
+% report_timing_errors('..\examples\output\type1_LDA_34\annotScore', 'LDA', '..\examples\output\type1_ARTLorg_34\annotScore', 'ARTL', '..\examples\output\type1_ARTLimb_34\annotScore', 'ARTLimb', '34', '.\timingError', 8);
+% report_timing_errors('..\examples\output\type1_LDA_35\annotScore', 'LDA', '..\examples\output\type1_ARTLorg_35\annotScore', 'ARTL', '..\examples\output\type1_ARTLimb_35\annotScore', 'ARTLimb', '35', '.\timingError', 8);
 function report_timing_errors(inPath1, title1, inPath2, title2, inPath3, title3, targetClass, outPath, maxError)
 
     [allErrors1, ~, plotData1, plotError1] = getTimingErrors(inPath1, targetClass, maxError); % LDA
@@ -31,7 +31,7 @@ function report_timing_errors(inPath1, title1, inPath2, title2, inPath3, title3,
     else
         title('Foe vs. others');
     end
-    fprintf('avearge, %f, %f, %f\n', mean(allErrors1), mean(allErrors2), mean(allErrors3));
+    fprintf('avearge (std), %.2f (%.2f), %.2f (%.2f), %.2f (%.2f)\n', mean(allErrors1), std(allErrors1), mean(allErrors2), std(allErrors2), mean(allErrors3), std(allErrors3));
     
     fileName = ['timingError_target_' targetClass];
     saveas(fH, [outPath filesep fileName '.fig'], 'fig');

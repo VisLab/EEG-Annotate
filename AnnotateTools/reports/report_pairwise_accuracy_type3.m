@@ -2,6 +2,8 @@
 %
 % report_pairwise_accuracy_type3('D:\temp\PREP_ICA_MARA_averagePower_LDA_34', 'LDA', 'D:\temp\PREP_ICA_MARA_averagePower_ARTLorg_34', 'ARTLorg', 'D:\temp\PREP_ICA_MARA_averagePower_ARTLimb_34', 'ARTLimb', '34', '.\pair_type3\friend', [0.3 1.0]);
 % report_pairwise_accuracy_type3('D:\temp\PREP_ICA_MARA_averagePower_LDA_35', 'LDA', 'D:\temp\PREP_ICA_MARA_averagePower_ARTLorg_35', 'ARTLorg', 'D:\temp\PREP_ICA_MARA_averagePower_ARTLimb_35', 'ARTLimb', '35', '.\pair_type3\foe', [0.3 1.0]);
+% report_pairwise_accuracy_type3('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_LDA_34', 'LDA', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLorg_34', 'ARTLorg', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_34', 'ARTLimb', '34', '.\pair_type3\friend', [0.3 1.0]);
+% report_pairwise_accuracy_type3('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_LDA_35', 'LDA', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLorg_35', 'ARTLorg', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_35', 'ARTLimb', '35', '.\pair_type3\foe', [0.3 1.0]);
 function report_pairwise_accuracy_type3(inPath1, title1, inPath2, title2, inPath3, title3, targetClass, outPath, plotRange)
 
     accuracy1 = getBalancedAccuracy(inPath1, targetClass); % LDA
@@ -33,7 +35,16 @@ function report_pairwise_accuracy_type3(inPath1, title1, inPath2, title2, inPath
     legend(title1, title3, 'Location', 'southeast');
     title([title1 ': ' num2str(mean(accuracy1), '%.3f') ', ' title2 ': ' num2str(mean(accuracy2), '%.3f') ', ' title3 ': ' num2str(mean(accuracy3), '%.3f')]);
     axis  square;
-    fprintf('avearge, %f, %f, %f\n', mean(accuracy1), mean(accuracy2), mean(accuracy3));
+    fprintf('avearge (std), LDA, %.1f (%.2f), ARTL, %.1f (%.2f), ARTLimb, %.1f (%.2f)\n', mean(accuracy1)*100, std(accuracy1)*100, mean(accuracy2)*100, std(accuracy2)*100, mean(accuracy3)*100, std(accuracy3)*100);
+    
+    fprintf('ARTL > LDA?\n');
+    [h, p, ci, stats] = ttest(accuracy2, accuracy1, 'Alpha', 0.001, 'Tail', 'right') % one-sided t-test (ARTL > LDA?)
+    
+    fprintf('ARTLimb > LDA?\n');
+    [h, p, ci, stats] = ttest(accuracy3, accuracy1, 'Alpha', 0.001, 'Tail', 'right') % one-sided t-test (ARTL > LDA?)
+    
+    fprintf('ARTLimb > ARTL?\n');
+    [h, p, ci, stats] = ttest(accuracy3, accuracy2, 'Alpha', 0.001, 'Tail', 'right') % one-sided t-test (ARTL > LDA?)
     
     fileName = ['pairwise_' num2str(mean(accuracy1)*100, '%.2f') '_' num2str(mean(accuracy2)*100, '%.2f') '_' num2str(mean(accuracy3)*100, '%.2f') '_target_' targetClass];
     saveas(fH, [outPath filesep fileName '.fig'], 'fig');
