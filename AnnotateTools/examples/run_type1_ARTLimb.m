@@ -1,55 +1,56 @@
 %% To annotate EEG datasets, this example script runs the following five jobs in batch.
 % 
-% 1) Preprocess
-% 2) Feature extraction
-% 3) Score estimation1, estiamting classification score of window samples
-% 4) Score estimation2, estimating annotation score of sub-window samples
-% 5) Report
+%   1) Preprocess
+%   2) Feature extraction
+%   3) Score estimation1, estiamting classification score of window samples
+%   4) Score estimation2, estimating annotation score of sub-window samples
+%   5) Report
 % 
-% Reference:
-% Kyung-min Su, W. David Hairston, Kay Robbins, "Automated annotation for continuous EEG data", 2016
+%   Reference:
+%       Kyung-min Su, W. David Hairston, Kay Robbins, "Automated annotation for continuous EEG data", 2016
 %  
-% Kyung-min Su, The University of Texas at San Antonio, 2016-11-07
+%   Authou:
+%       Kyung-min Su, The University of Texas at San Antonio, 2016
 % 
 
 clear; close all;
 
 %% 0) Parameters
+pathIn = 'Z:\Data 3\VEP\VEP_PrepClean_Infomax';   
 % path to input raw EEG data in .set format. 
 % Assume, they have been already PREP and ICA processed.
-pathIn = 'Z:\Data 3\VEP\VEP_PrepClean_Infomax';   
-% path to store temporary data
+
 pathTemp = 'D:\temp';
-% path to store annotation scores and reports
+% path to store temporary data
+
 pathOutput = '.\output\type1_ARTLimb_34';  % '35'
-% positive class
+% path to store annotation scores and reports
+
 trainTargetClass = '34';  % '35'
-% in a report, show these events in test data
+% positive class
+
 testTargetClasses = {'34'};  % '35'
-% name of the positive class
+% in a report, show these events in test data
+
 className = 'Friend';  % 'Foe'
+% name of the positive class
 
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 rng('default'); % to reproduce results, keep use the same random seed
 
 %% 1) Preprocess
-%  The preprocess dedidated to the VEP dataset
-%  - fix the data length of dataset #12
-%  - exclude external channels 
 batch_preprocess_VEP_exclusive(pathIn, ...
              'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2'], ...
              'boundary', 1);
-%  Remove artifacts using the MARA toolbox
-%  Note: it assumes that input data is already PREP and ICA processed.
-%        If not, apply PREP and ICA first.
+%  The preprocess dedidcated to the VEP dataset
+%  - fix the data length of dataset #12 (cut at 600 seconds)
+%  - exclude external channels located out of the head area
+         
 batch_preprocess_cleanMARA([pathTemp filesep 'VEP_PREP_ICA_VEP2'], ...
              'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA']);
+%  Remove artifacts using the MARA toolbox
 
 %% 2) Feature extraction
-%  Feature: avearge power of subbands and subwindows
-%  Note: to process different headsets data in the same way, 
-%        it always generates new EEG data for the target headset 
-%        and extracts features from the new data.
 batch_feature_averagePower([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA'], ...
              'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower'], ...
              'targetHeadset', 'biosemi64.sfp', ...
@@ -57,11 +58,15 @@ batch_feature_averagePower([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA'], ...
              'windowLength', 1.0, ...
              'subWindowLength', 0.125, ...
              'step', 0.125);
+%  Feature: avearge power of subbands and subwindows
+%  Note: it stores extracted samples and their class labels in the specified output path.
+%       samples: 2D array [feature size x number of samples] 
+%               Each column is one sample.
+%       labels: a cell array containing class labels of samples.  
+%               Each cell might contain more than one string.
+
 
 %% 3) Estimate classification scores of window samples
-%   Using the ARTLimb classifier (ARTLimb: ARTL modified for imbalanced data)
-%   Training set: VEP data
-%   Test set: VEP data
 batch_classify_ARTLimb([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower'], ...  % test data
              [pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower'], ...          % training data
              'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_' trainTargetClass], ...
@@ -76,10 +81,11 @@ batch_classify_ARTLimb([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower'],
              'IMB_W', [true true false], ...
              'IMB_AC2', true, ...
              'fSaveTrainScore', true);
-
+%   Using the ARTLimb classifier (ARTLimb: ARTL modified for imbalanced data)
+%   Training set: VEP data
+%   Test set: VEP data
+         
 %% 4) Estimate annotation scores of window sub-samples
-%  Estimate annotation scores from classification scores
-%  using weighting, zero-out, and fuzzy voting
 batch_annotation([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_' trainTargetClass], ...
              'outPath', [pathOutput filesep 'annotScore'], ...
              'excludeSelf', true, ...
@@ -87,39 +93,45 @@ batch_annotation([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_
              'rescaleBeforeCombining', true, ...
              'position', 8, ...
              'weights', [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5]);
+%  Estimate annotation scores from classification scores
+%  using weighting, zero-out, and fuzzy voting
 
 %%  5) Generate various reports
-%  Ranked Average Precision (RAP)
 batch_report_RAP([pathOutput filesep 'annotScore'], ...
              'outPath', [pathOutput filesep 'report'], ...
              'targetClasses', testTargetClasses, ...   % hit if it is any one of these class
              'timinigTolerances', 0:7); 
-% Recall         
+%  Ranked Average Precision (RAP)
+
 batch_report_recall([pathOutput filesep 'annotScore'], ...
              'outPath', [pathOutput filesep 'report'], ...
              'targetClasses', testTargetClasses, ...   % hit if it is any one of these class
              'timinigTolerances', 0:7, ...
              'retrieveNumbs', 100:100:500); 
-% Precision         
+% Recall         
+
 batch_report_precision([pathOutput filesep 'annotScore'], ...
              'outPath', [pathOutput filesep 'report'], ...
              'targetClasses', testTargetClasses, ...   % hit if it is any one of these class
              'timinigTolerances', 0:7, ...
              'maxAnnotation', 100); 
-% Plot predicted positive samples in each test data         
+% Precision         
+
 batch_plot_allPredictions_VEPevent([pathOutput filesep 'annotScore'], ...
              'outPath', [pathOutput filesep 'report' filesep 'plotAllScores'], ...
              'sampleSize', 0.125, ...   % length of one sample
              'plotLength', 500, ...     % length showed in a plot, 240frames = 30seconds.
              'plotClasses', {'63', '38', '39'; '33', '34', '35'}, ...
              'fBinary', false); 
-% Plot true event labels around the predicted positive samples          
+% Plot predicted positive samples in each test data         
+
 batch_plot_true_in_wing([pathOutput filesep 'annotScore'], ...
              'outPath', [pathOutput filesep 'report' filesep 'plotTrueWing'], ...
              'timingTolerances', 2, ...
              'offPast', 32, ...
              'offFuture', 32, ...
              'titleStr', [className '_No_re_ranking']);   % number of sub-window smaples in each window
+% Plot true event labels around the predicted positive samples          
          
 %% Done
 disp(['Done. To save the disk space, you can delete the temp folders under ' pathTemp '.']);

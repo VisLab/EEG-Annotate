@@ -1,14 +1,30 @@
-%% Processes dedicated for the VEP datasets
-% 
-%  1) Cut subject 12 datasets into 600 seconds length
-%  2) Remove external channels because annotator uses only EEG channels
-%     External channel : the channel out of the head boundary. 
-%
-%  Parameters:
-%       inPat: the pash to the EEG datasets
-%       outPath: the path to the place where filtered EEG datasets are saved
-%
 function outPath = batch_preprocess_VEP_exclusive(inPath, varargin)
+%   batch_preprocess_VEP_exclusive() 
+%       - Processes dedicated for the VEP datasets
+%       1) Cut subject 12 datasets at 600 seconds length
+%           * Experiment VEP 12 was accidentally left on after 570 seconds when nothing was going on.
+%       2) Remove external channels because annotator uses only EEG channels
+%           External channel : the channel out of the head boundary. 
+%
+%   Example:
+%       outPath = batch_preprocess_VEP_exclusive('.\pathIn', 'outPath', '.\pathOut', 'boundary', 1);
+%  
+%   Inputs:
+%       inPat: the pash to the EEG datasets
+%   
+%   Optional inputs:
+%       'outPath': the path to the place where processed EEG datasets will be saved. (default: '.\temp')
+%       'boundary': the size of a head. (default 1)
+%                   if channels are located out of the boundary, they are excluded.
+%
+%   Output:
+%       outPath: the path to the place where processed EEG datasets were saved
+%
+%   Note:
+%
+%   Authou:
+%       Kyung-min Su, The University of Texas at San Antonio, 2016
+%
 
     %Setup the parameters and reporting for the call   
     params = vargin2struct(varargin);  

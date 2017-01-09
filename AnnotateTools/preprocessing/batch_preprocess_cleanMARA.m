@@ -1,10 +1,26 @@
-%% Remove artifacts from the all EEG datasets in the inPath
-%  
-%  Parameters:
-%       inPat: the pash to the EEG datasets
-%       outPath: the path to the place where cleaned EEG datasets are saved
-%
 function outPath = batch_preprocess_cleanMARA(inPath, varargin)
+%   batch_preprocess_cleanMARA() 
+%       - Remove artifacts from the all EEG datasets in the inPath using MARA method
+%
+%   Example:
+%       outPath = batch_preprocess_cleanMARA('.\pathIn', 'outPath', '.\pathOut');
+%  
+%   Inputs:
+%       inPat: the pash to the EEG datasets
+%   
+%   Optional inputs:
+%       'outPath': the path to the place where processed EEG datasets will be saved. (default: '.\temp')
+%
+%   Output:
+%       outPath: the path to the place where processed EEG datasets were saved
+%
+%   Note:
+%       It assumes that input data is already PREP and ICA processed.
+%       If not, apply PREP and ICA before running calling this function.
+%
+%   Authou:
+%       Kyung-min Su, The University of Texas at San Antonio, 2016
+%
 
     %Setup the parameters and reporting for the call   
     params = vargin2struct(varargin);  
