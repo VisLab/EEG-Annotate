@@ -9,7 +9,7 @@
 %   Reference:
 %       Kyung-min Su, W. David Hairston, Kay Robbins, "Automated annotation for continuous EEG data", 2016
 %  
-%   Authou:
+%   Author:
 %       Kyung-min Su, The University of Texas at San Antonio, 2016
 % 
 
@@ -23,16 +23,16 @@ pathIn = 'Z:\Data 3\VEP\VEP_PrepClean_Infomax';
 pathTemp = 'D:\temp';
 % path to store temporary data
 
-pathOutput = '.\output\type1_ARTLimb_34';  % '35'
+pathOutput = '.\output\type1_ARTLimb_34';  % '34', '35'
 % path to store annotation scores and reports
 
-trainTargetClass = '34';  % '35'
+trainTargetClass = '34';  % '34', '35'
 % positive class
 
-testTargetClasses = {'34'};  % '35'
+testTargetClasses = {'34'};  % '34', '35'
 % in a report, show these events in test data
 
-className = 'Friend';  % 'Foe'
+className = 'Friend';  % 'Friend', 'Foe'
 % name of the positive class
 
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
@@ -65,12 +65,11 @@ batch_feature_averagePower([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA'], ...
 %       labels: a cell array containing class labels of samples.  
 %               Each cell might contain more than one string.
 
-
 %% 3) Estimate classification scores of window samples
 batch_classify_ARTLimb([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower'], ...  % test data
              [pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower'], ...          % training data
+             trainTargetClass, ...
              'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_' trainTargetClass], ...
-             'targetClass', trainTargetClass, ...
              'ARRLS_p', 10, ...     % ARRLS parameters
              'ARRLS_sigma', 0.1, ...
              'ARRLS_lambda', 10.0, ...
@@ -82,8 +81,17 @@ batch_classify_ARTLimb([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower'],
              'IMB_AC2', true, ...
              'fSaveTrainScore', true);
 %   Using the ARTLimb classifier (ARTLimb: ARTL modified for imbalanced data)
-%   Training set: VEP data
-%   Test set: VEP data
+%   Note:
+%       It stores estimated classification scores using the scoreData structure. 
+%       scoreData structure has eight fields.
+%           testLabel = the cell containing the true labels of test samples
+%           predLabel = the cell containing the predicted labels of test samples
+%           testInitProb = the cell containing the intial scores 
+%           testInitCutoff = the array of intial cutoff
+%           testFinalScore = the cell containing the final scores 
+%           testFinalCutoff = the array of final cutoff
+%           trainLabel = the cell containing the true labels of training samples
+%           trainScore = the cell containing the scores of training samples
          
 %% 4) Estimate annotation scores of window sub-samples
 batch_annotation([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_' trainTargetClass], ...
@@ -133,5 +141,12 @@ batch_plot_true_in_wing([pathOutput filesep 'annotScore'], ...
              'titleStr', [className '_No_re_ranking']);   % number of sub-window smaples in each window
 % Plot true event labels around the predicted positive samples          
          
+batch_plot_aligned_window_scores([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_' trainTargetClass], ...
+             'outPath', [pathOutput filesep 'report'], ...
+             'targetClasses', testTargetClasses, ...
+             'excludeSelf', true, ...
+             'neighborSize', 10);
+% Plot the window scores aligned at sub-window 0         
+
 %% Done
 disp(['Done. To save the disk space, you can delete the temp folders under ' pathTemp '.']);

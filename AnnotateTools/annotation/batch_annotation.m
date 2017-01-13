@@ -1,51 +1,50 @@
-%% Estimate annotation scores using the annotator
-%  
-%  Parameters:
-%       inPat: the pash to the classification scores
-%       outPath: the path to the place where estimated scores are saved
-%
 function outPath = batch_annotation(inPath, varargin)
 %   batch_annotation() 
 %       - estimate annotation scores using the annotator
-%       - annotator currently use the Fuzzy voting and adaptive cutoff
+%       - the annotator uses the Fuzzy voting and adaptive cutoff
 %
 %   Example:
-%       outPath = batch_annotation('.\pathIn_test', '\pathIn_train', 'outPath', '.\pathOut');
-%  
+%       outPath = batch_annotation('.\pathIn');
+%       outPath = batch_annotation('.\pathIn', ...
+%                    'outPath', '.\pathOut', ...
+%                    'excludeSelf', true, ...
+%                    'adaptiveCutoff', true, ...
+%                    'rescaleBeforeCombining', true, ...
+%                    'position', 8, ...
+%                    'weights', [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5]);
+%
 %   Inputs:
-%       inPath_test: the pash to the test EEG datasets
-%       inPath_train: the pash to the training EEG datasets
+%       inPath: the pash to the classification scores
 %   
 %   Optional inputs:
-%       'outPath': the path to the place where estimated classification scores will be saved. (default: '.\temp')
-%       'targetClass', trainTargetClass, ...
-%       'ARRLS_p', ARRLS option p (default: 10)
-%       'ARRLS_sigma',  ARRLS option sigma weight (default: 0.1)
-%       'ARRLS_lambda',  ARRLS option lambda weight (default: 10.0)
-%       'ARRLS_gamma',  ARRLS option gamma weight (default: 1.0)
-%       'ARRLS_ker',  ARRLS option kernel name (default: 'linear')
-%       'IMB_BT', option to use balanced training set for the initial classifier (default: true)
-%       'IMB_AC1', option to use the adaptive cutoff on the intial scores (default: true)
-%       'IMB_W', option to use reweighting for three terms (default: [true true false])
-%       'IMB_AC2', option to use the adaptive cutoff on the final scores (default: true)
-%       'fSaveTrainScore', if true, save the training scores too
+%       'outPath': the path to the place where estimated annotation scores will be saved. (default: '.\temp')
+%       'excludeSelf', when we use the same datasets for training and test, 
+%                      if this flag is true, the test set is excluded from the training set.
+%                      If the flag is false, it uses all training sets for annotaion.
+%       'adaptiveCutoff', option to use the adaptive cutoff on the combined scores
+%       'rescaleBeforeCombining', if true, normalize scores so that they are in 0 to 1 range, before combining
+%       'position', the center of re-weighting area
+%       'weights',  the weights of scores
 %
 %   Output:
-%       outPath: the path to the place where classification scores were saved
+%       outPath: the path to the place where annotation scores were saved
 %
 %   Note:
-%       It stores estimated classification scores using the scoreData structure. 
-%       scoreData structure has eight fields.
-%           testLabel = the cell containing the true labels of test samples
-%           predLabel = the cell containing the predicted labels of test samples
-%           testInitProb = the cell containing the intial scores 
-%           testInitCutoff = the array of intial cutoff
-%           testFinalScore = the cell containing the final scores 
-%           testFinalCutoff = the array of final cutoff
-%           trainLabel = the cell containing the true labels of training samples
-%           trainScore = the cell containing the scores of training samples
+%       It stores estimated classification scores using the annotData structure. 
+%       annotData structure has eight fields.
+%           testLabel: the cell containing the true labels of test samples
+%           predLabel: the cell containing the predicted labels of test samples
+%           testInitProb: the cell containing the intial scores 
+%           testInitCutoff: the array of intial cutoff
+%           testFinalScore: the cell containing the final scores 
+%           testFinalCutoff: the array of final cutoff
+%           trainLabel: the cell containing the true labels of training samples
+%           trainScore: the cell containing the scores of training samples
+%           wmScore: the cell containing the weighted and mask-out scores
+%           allScores: the 2D matrix containing normalized wmScore. [number of samples x number of training sets]
+%           combinedScore = the array of combined and mask-out scores
 %
-%   Authou:
+%   Author:
 %       Kyung-min Su, The University of Texas at San Antonio, 2016
 %
 

@@ -4,15 +4,9 @@
 %
 %  Do not exclude boundary (masked) samples
 %
-function scoreData = classify_ARTLimbs(dataTest, inPath_train, varargin)
+function scoreData = classify_ARTLimbs(dataTest, inPath_train, targetClass, varargin)
 
     %Setup the parameters and reporting for the call   
-    params = vargin2struct(varargin);  
-    if isfield(params, 'targetClass')
-        targetClass = params.targetClass;
-    else
-        error('Target class must be specified');
-    end
     % ARRLS option
     optionARRLS.p = 10;             % default
     if isfield(params, 'ARRLS_p')

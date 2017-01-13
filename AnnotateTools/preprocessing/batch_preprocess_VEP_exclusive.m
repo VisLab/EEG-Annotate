@@ -7,7 +7,7 @@ function outPath = batch_preprocess_VEP_exclusive(inPath, varargin)
 %           External channel : the channel out of the head boundary. 
 %
 %   Example:
-%       outPath = batch_preprocess_VEP_exclusive('.\pathIn', 'outPath', '.\pathOut', 'boundary', 1);
+%       outPath = batch_preprocess_VEP_exclusive('.\pathIn', 'outPath', '.\pathOut');
 %  
 %   Inputs:
 %       inPat: the pash to the EEG datasets
@@ -22,7 +22,7 @@ function outPath = batch_preprocess_VEP_exclusive(inPath, varargin)
 %
 %   Note:
 %
-%   Authou:
+%   Author:
 %       Kyung-min Su, The University of Texas at San Antonio, 2016
 %
 

@@ -2,8 +2,9 @@ function outPath = batch_feature_averagePower(inPath, varargin)
 %   batch_feature_averagePower() 
 %       - extract average power feature from raw EEG data
 %
-%   Example:
-%       outPath = batch_feature_averagePower('.\pathIn', ...
+%   Examples:
+%       outPath = batch_feature_averagePower('.\pathIn'); 
+%       outPath = batch_feature_averagePower('.\pathIn', 
 %             'outPath', '.\pathOut', ...
 %             'targetHeadset', 'biosemi64.sfp', ...
 %             'subbands', [0 4; 4 8; 8 12; 12 16; 16 20; 20 24; 24 28; 28 32], ...
@@ -32,7 +33,7 @@ function outPath = batch_feature_averagePower(inPath, varargin)
 %       labels: a cell array containing class labels of samples.  
 %               Each cell might contain more than one string.
 %
-%   Authou:
+%   Author:
 %       Kyung-min Su, The University of Texas at San Antonio, 2016
 %
 

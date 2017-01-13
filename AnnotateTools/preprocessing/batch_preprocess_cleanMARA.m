@@ -15,10 +15,10 @@ function outPath = batch_preprocess_cleanMARA(inPath, varargin)
 %       outPath: the path to the place where processed EEG datasets were saved
 %
 %   Note:
-%       It assumes that input data is already PREP and ICA processed.
+%       It assumes that input data is already PREP and ICA preprocessed.
 %       If not, apply PREP and ICA before running calling this function.
 %
-%   Authou:
+%   Author:
 %       Kyung-min Su, The University of Texas at San Antonio, 2016
 %
 

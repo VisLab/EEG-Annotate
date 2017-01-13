@@ -1,18 +1,30 @@
-function outPath = batch_classify_ARTLimb(inPath_test, inPath_train, varargin)
+function outPath = batch_classify_ARTLimb(inPath_test, inPath_train, targetClass, varargin)
 %   batch_classify_ARTLimb() 
 %       - estimate classification scores of samples using the ARTLimb classifier
 %       - ARTLimb classifier: ARTL classifier modified to handle imbalanced data
 %
 %   Example:
-%       outPath = batch_classify_ARTLimb('.\pathIn_test', '\pathIn_train', 'outPath', '.\pathOut', 'targetClass', '34');
-%  
+%       outPath = batch_classify_ARTLimb('.\pathIn_test', '\pathIn_train', 'targetClass', '34');
+%       outPath = batch_classify_ARTLimb('.\pathIn_test', '\pathIn_train', 'targetClass', '34', 
+%                                       'outPath', '.\pathOut', ...
+%                                       'ARRLS_p', 10, ...    
+%                                       'ARRLS_sigma', 0.1, ...
+%                                       'ARRLS_lambda', 10.0, ...
+%                                       'ARRLS_gamma', 1.0, ...
+%                                       'ARRLS_ker', 'linear', ...
+%                                       'IMB_BT', true, ...   
+%                                       'IMB_AC1', true, ...
+%                                       'IMB_W', [true true false], ...
+%                                       'IMB_AC2', true, ...
+%                                       'fSaveTrainScore', true);
+% 
 %   Inputs:
 %       inPath_test: the pash to the test EEG datasets
 %       inPath_train: the pash to the training EEG datasets
+%       'targetClass': the labels of target class
 %   
 %   Optional inputs:
 %       'outPath': the path to the place where estimated classification scores will be saved. (default: '.\temp')
-%       'targetClass': the labels of target class
 %       'ARRLS_p': ARRLS option p (default: 10)
 %       'ARRLS_sigma':  ARRLS option sigma weight (default: 0.1)
 %       'ARRLS_lambda':  ARRLS option lambda weight (default: 10.0)
@@ -39,7 +51,7 @@ function outPath = batch_classify_ARTLimb(inPath_test, inPath_train, varargin)
 %           trainLabel = the cell containing the true labels of training samples
 %           trainScore = the cell containing the scores of training samples
 %
-%   Authou:
+%   Author:
 %       Kyung-min Su, The University of Texas at San Antonio, 2016
 %
 
@@ -58,7 +70,7 @@ function outPath = batch_classify_ARTLimb(inPath_test, inPath_train, varargin)
     fileList_test = dir([inPath_test filesep '*.mat']);
     for i=1:length(fileList_test)
         testData = load([inPath_test filesep fileList_test(i).name]);
-        scoreData = classify_ARTLimbs(testData, inPath_train, varargin{:});
+        scoreData = classify_ARTLimbs(testData, inPath_train, targetClass, varargin{:});
         save([outPath filesep fileList_test(i).name], 'scoreData', '-v7.3');
     end
 end
