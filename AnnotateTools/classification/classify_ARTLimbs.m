@@ -7,6 +7,7 @@
 function scoreData = classify_ARTLimbs(dataTest, inPath_train, targetClass, varargin)
 
     %Setup the parameters and reporting for the call   
+    params = vargin2struct(varargin); 
     % ARRLS option
     optionARRLS.p = 10;             % default
     if isfield(params, 'ARRLS_p')
@@ -49,6 +50,10 @@ function scoreData = classify_ARTLimbs(dataTest, inPath_train, targetClass, vara
     if isfield(params, 'fSaveTrainScore')
         fSaveTrainScore = params.fSaveTrainScore;
     end
+    pseudoLabel = [];
+    if isfield(params, 'pseudoLabel')
+        pseudoLabel = params.pseudoLabel;
+    end
 
     fileList_train = dir([inPath_train filesep '*.mat']);
     num_train = length(fileList_train);
@@ -73,12 +78,11 @@ function scoreData = classify_ARTLimbs(dataTest, inPath_train, targetClass, vara
     % go over all test files and estimate scores
     % In case of LDA, training loop is outer loop to avoid repeating of training classifiers.
     % In case of ARRLS, the loop reading larger dataset is outer loop to reduce the reading overhead.
-    testLabeltemp = zeros(size(testSample, 2), 1);    % for temporary, use all zero labels.
     for trainIdx = 1:num_train
         trainFileName = fileList_train(trainIdx).name;
         [trainSample, trainLabel] = getTrainingData(inPath_train, trainFileName, targetClass);
 
-        [finalScore, finalCutoff, initProb, initCutoff, trainScore] = ARRLS_imb(double(trainSample), double(testSample), trainLabel, testLabeltemp, optionARRLS, optionIMB);        
+        [finalScore, finalCutoff, initProb, initCutoff, trainScore] = ARRLS_imb(double(trainSample), double(testSample), trainLabel, pseudoLabel, optionARRLS, optionIMB);        
         
         scoreData.predLabel{trainIdx} = (finalScore > finalCutoff);  
         scoreData.testFinalScore{trainIdx} = finalScore;

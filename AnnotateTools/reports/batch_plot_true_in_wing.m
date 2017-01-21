@@ -78,6 +78,13 @@ function outPath = batch_plot_true_in_wing(inPath, varargin)
         imagesc(sortData, [1 length(tickLabels)]);
         colormap(cmap);
         
+        if isfield(annotData, 'combinedCutoff');
+            numbPositives = sum(annotData.combinedScore > annotData.combinedCutoff);
+            hold on
+            plot([0 size(sortData, 2)], [numbPositives+1 numbPositives+1], 'k:', 'LineWidth', 3)
+            hold off
+        end
+        
         colorbar('Ticks',1.5:(8.5-1.5)/8:8.5,'TickLabels',tickLabels, 'Direction', 'reverse');
         
         set(gca, 'XTick', 1:(offPast+offFuture+1), 'XTickLabel', xticklabel);

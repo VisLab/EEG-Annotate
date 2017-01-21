@@ -12,9 +12,13 @@ function annotData = annotator(scoreData, selfIdx, varargin)
     if isfield(params, 'excludeSelf')
         excludeSelf = params.excludeSelf;
     end
-    adaptiveCutoff = false;   % default: fixed cutoff 0.0 
-    if isfield(params, 'adaptiveCutoff')
-        adaptiveCutoff = params.adaptiveCutoff;
+    adaptiveCutoff1 = false;   % default: fixed cutoff 0.0 
+    if isfield(params, 'adaptiveCutoff1')
+        adaptiveCutoff1 = params.adaptiveCutoff1;
+    end
+    adaptiveCutoff2 = false;   % default: fixed cutoff 0.0 
+    if isfield(params, 'adaptiveCutoff2')
+        adaptiveCutoff2 = params.adaptiveCutoff2;
     end
     rescaleBeforeCombining = true;  
     if isfield(params, 'rescaleBeforeCombining')
@@ -37,16 +41,32 @@ function annotData = annotator(scoreData, selfIdx, varargin)
         end
         rawScore = scoreData.testFinalScore{trainIdx};
 
-        % calculate weighted sub-windows scores
-        wScore = getWeightedScore(rawScore, weights, position);
-
-        if adaptiveCutoff == true
-            cutoff = getCutoff_FL(wScore, 30, 0.0);
+        if adaptiveCutoff1 == true
+            cutoff = getCutoff_FL(rawScore, 30, 0.0);   % adaptive cutoff
         else
             cutoff = 0.0;
         end
-                
-        % Use a greedy algorithm to take best scores
+        
+        shiftedScore = rawScore - cutoff;       % now the score has zero cutoff
+
+        noNegativeShiftedScore = shiftedScore;
+        noNegativeShiftedScore(shiftedScore < 0) = 0;   % remove everything below zero
+
+        if rescaleBeforeCombining == true
+            nonZeroScore = noNegativeShiftedScore(noNegativeShiftedScore > 0);
+            cutMax = prctile(nonZeroScore, 98);             % use percentile to scaling
+
+            normalizedScore = noNegativeShiftedScore;
+            normalizedScore(normalizedScore > cutMax) = cutMax;
+            normalizedScore = normalizedScore ./ cutMax;              % score range is 0 to 1.
+        else 
+            normalizedScore = noNegativeShiftedScore;
+        end
+        
+        wScore = getWeightedScore(normalizedScore, weights, position); % calculate weighted sub-windows scores
+
+        cutoff = 0;
+
         mScore = getMaskOutScore(wScore, 7, cutoff);  % mask out 15 elements         
 
         scoreData.wmScore{trainIdx} = mScore; % weighted and mask-out score
@@ -60,55 +80,31 @@ function annotData = annotator(scoreData, selfIdx, varargin)
         
         wmScore = scoreData.wmScore{trainIdx};
 
-        if rescaleBeforeCombining == true
-            % How to scale scores?
-            % 1) 2)
-%             cutPrecentage = 95; cutMax = 0;
-%             while (cutMax == 0)
-%                 cutMax = prctile(wmScore, cutPrecentage);
-%                 cutPrecentage = cutPrecentage + 1;
-%             end
-
-            % 3) 4)
-%             cutPrecentage = 95; cutMax = 0;
-%             nonZeroScore = wmScore(wmScore > 0);
-%             while (cutMax == 0)
-%                 cutMax = prctile(nonZeroScore, cutPrecentage);
-%                 cutPrecentage = cutPrecentage + 1;
-%             end
-            
-            % 5-8)
-            nonZeroScore = wmScore(wmScore > 0);
-            cutMax = mean(nonZeroScore); % - (1 * std(nonZeroScore));
-          
-            wmScore(wmScore > cutMax) = cutMax;
-            wmScore = wmScore ./ cutMax;
-
-            % 9)
-%             wmScore(wmScore > 0) = 1;
-            
-        end
         allScores = cat(2, allScores, wmScore);
     end
     scoreData.allScores = allScores;
     
-    theseScores = mean(allScores, 2);   % sum of sub-window scores
+    theseScores = mean(allScores, 2);   % average of sub-window scores
     if sum(isnan(theseScores)) > 0
         error('nan score');
     end
     % Make up a weighting and calculate weighted scores
     wScore = getWeightedScore(theseScores, weights, position);% don't exclude negative scores
 
-    if adaptiveCutoff == true
-        cutoff = getCutoff_FL(wScore, 30, 0.5);
-    else
-        cutoff = 0.5;
-    end
+    cutoff = 0.0; 
     
     % Use a greedy algorithm to take best scores
     mScore = getMaskOutScore(wScore, 7, cutoff);  % mask out 15 elements         
 
     scoreData.combinedScore = mScore;
+    
+    if adaptiveCutoff2 == true
+        cutoff = getCutoff_FL(mScore(mScore > 0), 30, 0.0);     % cutoff estiamted from non-zero scores
+    else
+        cutoff = 0.0;
+    end
+
+    scoreData.combinedCutoff = cutoff;
     
     annotData = scoreData;
 end

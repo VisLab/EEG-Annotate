@@ -35,11 +35,17 @@ function [finalScore, finalCutoff, initProb, initCutoff, trainScore] = ARRLS_imb
         error('Imbalanced parameters should be set!');
     end
     
+    fYt0 = true;
+    if isempty(Yt)
+        fYt0 = false;
+        Yt = zeros(size(Xt, 2), 1);    % for temporary, use all zero labels.
+    end
+    
     fprintf('ARRLS started... \n');
     fprintf('\tker=%s, sigma=%f, lambda=%f, gamma=%f, p=%d\n',...
         optionARRLS.ker, optionARRLS.sigma, optionARRLS.lambda, optionARRLS.gamma, optionARRLS.p);
-    fprintf('\tBT=%d, AC1=%d, W=[%d %d %d], AC2=%d\n',...
-        optionIMB.BT, optionIMB.AC1, optionIMB.W(1), optionIMB.W(2), optionIMB.W(3), optionIMB.AC2);
+    fprintf('\tBT=%d, AC1=%d, W=[%d %d %d], AC2=%d, fYt0=%d\n',...
+        optionIMB.BT, optionIMB.AC1, optionIMB.W(1), optionIMB.W(2), optionIMB.W(3), optionIMB.AC2, fYt0);
 
     % Set predefined variables
     X = [Xs,Xt];
@@ -58,23 +64,30 @@ function [finalScore, finalCutoff, initProb, initCutoff, trainScore] = ARRLS_imb
     % Data normalization (into unit vector samples)
     X = X*diag(sparse(1./sqrt(sum(X.^2))));
 
-    % get pseudo labels of target samples
-    if optionIMB.BT == 1    % balance training samples
-        [Xtmp, Ytmp] = balanceOverMinor(sparse(X(:,1:Ns)), Y(1:Ns));
+    if fYt0 == false
+        % get pseudo labels of target samples
+        if optionIMB.BT == 1    % balance training samples
+            [Xtmp, Ytmp] = balanceOverMinor(sparse(X(:,1:Ns)), Y(1:Ns));
+        else
+            Xtmp = X(:,1:Ns);   Ytmp = Y(1:Ns); 
+        end
+        model = train(Ytmp,sparse(Xtmp'),'-s 0 -c 1 -q 1');
+        [~,~,initProb] = predict(Y(Ns+1:end),sparse(X(:,Ns+1:end)'),model,'-b 1');
+        initProb = initProb(:, 2);  % probability of positive class
+
+        if optionIMB.AC1 == false   % if adaptive cutoff flag is off
+            initCutoff = 0.5;
+        elseif optionIMB.AC1 == true  % estimate cutoff by fitting
+            initCutoff = getCutoff_FL(initProb, 30, 0.5);
+            %[initCutoff, mu1, sigma1, mu2 , sigma2, xgrid] = getCutoff_FL(initProb);
+        else
+            error('unsupported adaptive cutoff option');
+        end
+        Yp = double(initProb > initCutoff) + 1;         % classes 1, 2
     else
-        Xtmp = X(:,1:Ns);   Ytmp = Y(1:Ns); 
-    end
-    model = train(Ytmp,sparse(Xtmp'),'-s 0 -c 1 -q 1');
-    [~,~,initProb] = predict(Y(Ns+1:end),sparse(X(:,Ns+1:end)'),model,'-b 1');
-    initProb = initProb(:, 2);  % probability of positive class
-    
-    if optionIMB.AC1 == false   % if adaptive cutoff flag is off
-        initCutoff = 0.5;
-    elseif optionIMB.AC1 == true  % estimate cutoff by fitting
-        initCutoff = getCutoff_FL(initProb, 30, 0.5);
-        %[initCutoff, mu1, sigma1, mu2 , sigma2, xgrid] = getCutoff_FL(initProb);
-    else
-        error('unsupported adaptive cutoff option');
+        initProb = [];
+        initCutoff = 0;
+        Yp = Y(Ns+1:end);
     end
 %     % for debugging
 %     bFlagGMM = 0;
@@ -92,7 +105,6 @@ function [finalScore, finalCutoff, initProb, initCutoff, trainScore] = ARRLS_imb
 %     finalCutoff = abs(bestCutoff-initCutoff);   % kyung
     
     %
-    Yp = double(initProb > initCutoff) + 1;         % classes 1, 2
     Nt_n = sum(Yp==1);
     Nt_p = sum(Yp==2);
 
