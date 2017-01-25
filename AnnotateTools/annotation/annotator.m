@@ -35,6 +35,7 @@ function annotData = annotator(scoreData, selfIdx, varargin)
 
     trainsetNumb = length(scoreData.testFinalScore); 
     
+    allScores = [];
     for trainIdx = 1:trainsetNumb
         if (excludeSelf == true) && (selfIdx == trainIdx)
             continue;
@@ -69,19 +70,9 @@ function annotData = annotator(scoreData, selfIdx, varargin)
 
         mScore = getMaskOutScore(wScore, 7, cutoff);  % mask out 15 elements         
 
-        scoreData.wmScore{trainIdx} = mScore; % weighted and mask-out score
+		allScores = cat(2, allScores, mScore); % normalized, weighted and mask-outed scores
     end
     
-    allScores = [];
-    for trainIdx = 1:trainsetNumb
-        if (excludeSelf == true) && (selfIdx == trainIdx)
-            continue;
-        end
-        
-        wmScore = scoreData.wmScore{trainIdx};
-
-        allScores = cat(2, allScores, wmScore);
-    end
     scoreData.allScores = allScores;
     
     theseScores = mean(allScores, 2);   % average of sub-window scores

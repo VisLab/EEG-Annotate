@@ -23,47 +23,47 @@ pathIn = 'Z:\Data 3\VEP\VEP_PrepClean_Infomax';
 pathTemp = 'D:\temp';
 % path to store temporary data
 
-pathOutput = '.\output\type1_ARTLimb_35';  % '34', '35'
+pathOutput = '.\output\type1_ARTLimb_34';  % 'type1_ARTLimb_34', 'type1_ARTLimb_34'
 % path to store annotation scores and reports
 
-trainTargetClass = '35';  % '34', '35'
+trainTargetClass = '34';  % '34', '35'
 % positive class
 
-testTargetClasses = {'35'};  % '34', '35'
+testTargetClasses = {'34'};  % '34', '35'
 % in a report, show these events in test data
 
-className = 'Foe';  % 'Friend', 'Foe'
+className = 'Friend';  % 'Friend', 'Foe'
 % name of the positive class
 
 pop_editoptions('option_single', false, 'option_savetwofiles', false);
 rng('default'); % to reproduce results, keep use the same random seed
 
-% %% 1) Preprocess
-% batch_preprocess_VEP_exclusive(pathIn, ...
-%              'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2'], ...
-%              'boundary', 1);
-% %  The preprocess dedidcated to the VEP dataset
-% %  - fix the data length of dataset #12 (cut at 600 seconds)
-% %  - exclude external channels located out of the head area
-%          
-% batch_preprocess_cleanMARA([pathTemp filesep 'VEP_PREP_ICA_VEP2'], ...
-%              'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA']);
-% %  Remove artifacts using the MARA toolbox
-% 
-% %% 2) Feature extraction
-% batch_feature_averagePower([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA'], ...
-%              'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower'], ...
-%              'targetHeadset', 'biosemi64.sfp', ...
-%              'subbands', [0 4; 4 8; 8 12; 12 16; 16 20; 20 24; 24 28; 28 32], ...
-%              'windowLength', 1.0, ...
-%              'subWindowLength', 0.125, ...
-%              'step', 0.125);
-% %  Feature: avearge power of subbands and subwindows
-% %  Note: it stores extracted samples and their class labels in the specified output path.
-% %       samples: 2D array [feature size x number of samples] 
-% %               Each column is one sample.
-% %       labels: a cell array containing class labels of samples.  
-% %               Each cell might contain more than one string.
+%% 1) Preprocess
+batch_preprocess_VEP_exclusive(pathIn, ...
+             'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2'], ...
+             'boundary', 1);
+%  The preprocess dedidcated to the VEP dataset
+%  - fix the data length of dataset #12 (cut at 600 seconds)
+%  - exclude external channels located out of the head area
+         
+batch_preprocess_cleanMARA([pathTemp filesep 'VEP_PREP_ICA_VEP2'], ...
+             'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA']);
+%  Remove artifacts using the MARA toolbox
+
+%% 2) Feature extraction
+batch_feature_averagePower([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA'], ...
+             'outPath', [pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower'], ...
+             'targetHeadset', 'biosemi64.sfp', ...
+             'subbands', [0 4; 4 8; 8 12; 12 16; 16 20; 20 24; 24 28; 28 32], ...
+             'windowLength', 1.0, ...
+             'subWindowLength', 0.125, ...
+             'step', 0.125);
+%  Feature: avearge power of subbands and subwindows
+%  Note: it stores extracted samples and their class labels in the specified output path.
+%       samples: 2D array [feature size x number of samples] 
+%               Each column is one sample.
+%       labels: a cell array containing class labels of samples.  
+%               Each cell might contain more than one string.
 
 %% 3) Estimate classification scores of window samples
 batch_classify_ARTLimb([pathTemp filesep 'VEP_PREP_ICA_VEP2_MARA_averagePower'], ...  % test data

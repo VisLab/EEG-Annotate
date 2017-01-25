@@ -1,7 +1,7 @@
 %% Extract score3 (mask-out sub-window score)
 %
-% extract_score3('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_34', '.\extractData\score3', '34');
-% extract_score3('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_35', '.\extractData\score3', '35');
+% extract_score3('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_34', '.\output\extractData\score3', '34');
+% extract_score3('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_35', '.\output\extractData\score3', '35');
 function extract_score3(inPath, outPath, targetClass)
     weights = [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5];    
     position = 8;   

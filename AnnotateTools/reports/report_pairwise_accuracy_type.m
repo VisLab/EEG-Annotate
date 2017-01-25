@@ -1,7 +1,7 @@
 %% Pairwise classification accuracy
 %
-% report_pairwise_accuracy_type('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_LDA_34', 'LDA', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLorg_34', 'ARRLS', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_34', 'ARRLSimb', '34', '.\pair_type\friend', [0.3 1.0]);
-% report_pairwise_accuracy_type('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_LDA_35', 'LDA', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLorg_35', 'ARRLS', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_35', 'ARRLSimb', '35', '.\pair_type\foe', [0.3 1.0]);
+% report_pairwise_accuracy_type('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_LDA_34', 'LDA', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLorg_34', 'ARRLS', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_34', 'ARRLSimb', '34', '.\output\pair_type\friend', [0.3 1.0]);
+% report_pairwise_accuracy_type('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_LDA_35', 'LDA', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLorg_35', 'ARRLS', 'D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_35', 'ARRLSimb', '35', '.\output\pair_type\foe', [0.3 1.0]);
 function report_pairwise_accuracy_type(inPath1, title1, inPath2, title2, inPath3, title3, targetClass, outPath, plotRange)
 
     accuracy_LDA = getBalancedAccuracy(inPath1, targetClass); % LDA

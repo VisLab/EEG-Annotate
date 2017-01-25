@@ -1,9 +1,10 @@
-%% Generate reports using the recall metric
+function outPath = batch_plot_true_in_wing(inPath, varargin)
+%% Generate plots showing the true events around the detected samples
+%
 %  Parameters:
 %       inPat: the pash to the annotation scores
-%       outPath: the path to the place where the generated report is saved
+%       outPath: the path to the place where the generated plots is saved
 %
-function outPath = batch_plot_true_in_wing(inPath, varargin)
 
     %Setup the parameters and reporting for the call   
     params = vargin2struct(varargin);  
@@ -96,11 +97,36 @@ function outPath = batch_plot_true_in_wing(inPath, varargin)
         saveas(hf1, [outPath filesep fileName '.fig']);
         img = getframe(hf1);
         imwrite(img.cdata, [outPath filesep fileName '.png']);
+
         centerData = sortData(:, offPast+1);
-        fprintf('(Breakdown of predicted positives) subj, %d, %d, %d, %d, %d, %d, %d, %d, %d\n', ...
+        CRa = sum(centerData==1);
+        IRa = sum(centerData==2);
+        NRa = sum(centerData==3);
+        CRb = sum(centerData==4);
+        IRb = sum(centerData==5);
+        NRb = sum(centerData==6);
+        NoEvent = sum(centerData==7);
+        LowScore = sum(centerData==8);
+        fprintf('(Breakdown of predicted positives) subj, %d, %d, %d, %d, %d, %d, %d, %d, %d, %.2f, %.2f\n', ...
             testSubjID, ...
-            sum(centerData==1), sum(centerData==2), sum(centerData==3), sum(centerData==4), ...
-            sum(centerData==5), sum(centerData==6), sum(centerData==7), sum(centerData==8));
+            CRa, IRa, NRa, CRb, IRb, NRb, NoEvent, LowScore, ...
+            sum(CRa+IRa+NRa)/length(centerData), sum(CRb+IRb+NRb)/length(centerData));
+        if isfield(annotData, 'combinedCutoff');
+            numbPositives = sum(annotData.combinedScore > annotData.combinedCutoff);
+            centerData = sortData(1:numbPositives, offPast+1);
+            CRa = sum(centerData==1);
+            IRa = sum(centerData==2);
+            NRa = sum(centerData==3);
+            CRb = sum(centerData==4);
+            IRb = sum(centerData==5);
+            NRb = sum(centerData==6);
+            NoEvent = sum(centerData==7);
+            LowScore = sum(centerData==8);
+            fprintf('(Breakdown above the cutoff) subj, %d, %d, %d, %d, %d, %d, %d, %d, %d, %.2f, %.2f\n', ...
+                testSubjID, ...
+                CRa, IRa, NRa, CRb, IRb, NRb, NoEvent, LowScore, ...
+                sum(CRa+IRa+NRa)/length(centerData), sum(CRb+IRb+NRb)/length(centerData));
+        end        
     end
 end    
 

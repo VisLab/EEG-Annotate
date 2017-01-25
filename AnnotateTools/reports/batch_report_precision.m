@@ -1,9 +1,10 @@
-%% Generate reports using the recall metric
+function outPath = batch_report_precision(inPath, varargin)
+%% Generate reports using the precision metric
+%
 %  Parameters:
 %       inPat: the pash to the annotation scores
 %       outPath: the path to the place where the generated report is saved
 %
-function outPath = batch_report_precision(inPath, varargin)
 
     %Setup the parameters and reporting for the call   
     params = vargin2struct(varargin);  

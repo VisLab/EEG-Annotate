@@ -1,7 +1,7 @@
-%% Pairwise classification accuracy
+%% Timing errors
 %
-% report_timing_errors('..\examples\output\type1_LDA_34\annotScore', 'LDA', '..\examples\output\type1_ARTLorg_34\annotScore', 'ARRLS', '..\examples\output\type1_ARTLimb_34\annotScore', 'ARRLSimb', '34', '.\timingError', 8);
-% report_timing_errors('..\examples\output\type1_LDA_35\annotScore', 'LDA', '..\examples\output\type1_ARTLorg_35\annotScore', 'ARRLS', '..\examples\output\type1_ARTLimb_35\annotScore', 'ARRLSimb', '35', '.\timingError', 8);
+% report_timing_errors('..\examples\output\type1_LDA_34\annotScore', 'LDA', '..\examples\output\type1_ARTLorg_34\annotScore', 'ARRLS', '..\examples\output\type1_ARTLimb_34\annotScore', 'ARRLSimb', '34', '.\output\timingError', 8);
+% report_timing_errors('..\examples\output\type1_LDA_35\annotScore', 'LDA', '..\examples\output\type1_ARTLorg_35\annotScore', 'ARRLS', '..\examples\output\type1_ARTLimb_35\annotScore', 'ARRLSimb', '35', '.\output\timingError', 8);
 function report_timing_errors(inPath1, title1, inPath2, title2, inPath3, title3, targetClass, outPath, maxError)
 
     [allErrors1, ~, plotData1, plotError1] = getTimingErrors(inPath1, targetClass, maxError); % LDA

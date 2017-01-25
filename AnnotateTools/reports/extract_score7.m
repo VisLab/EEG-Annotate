@@ -1,7 +1,7 @@
 %% Extract score7 (mask-out smoothed combined scores)
 %
-% extract_score7_4_ac_on_win_score('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_34', '.\extractData\score7_acOnWin', '34');
-% extract_score7_4_ac_on_win_score('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_35', '.\extractData\score7_acOnWin', '35');
+% extract_score7_4_ac_on_win_score('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_34', '.\output\extractData\score7_acOnWin', '34');
+% extract_score7_4_ac_on_win_score('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_35', '.\output\extractData\score7_acOnWin', '35');
 function extract_score7_4_ac_on_win_score(inPath, outPath, targetClass)
     weights = [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5];    
     position = 8;   

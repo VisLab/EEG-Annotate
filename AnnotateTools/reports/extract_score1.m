@@ -1,7 +1,7 @@
 %% Extract score1 (window score)
 %
-% extract_score1('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_34', '.\extractData\score1', '34');
-% extract_score1('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_35', '.\extractData\score1', '35');
+% extract_score1('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_34', '.\output\extractData\score1', '34');
+% extract_score1('D:\temp\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_35', '.\output\extractData\score1', '35');
 function extract_score1(inPath, outPath, targetClass)
 
     if ~isdir(outPath)   % if the directory is not exist
