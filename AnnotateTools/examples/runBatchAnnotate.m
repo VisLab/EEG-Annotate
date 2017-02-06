@@ -14,6 +14,7 @@
 inPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_ARRLS';
 outPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_ARRLS_Annotation';
 targetClasses = {'34', '35'};
+params = struct();
 
 %% Set the directories for input and output for ARRLSMod
 % inPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_ARRLSMod';
@@ -29,5 +30,5 @@ targetClasses = {'34', '35'};
 for k = 1:length(targetClasses)
   inPath = [inPathBase '_' targetClasses{k}]; 
   outPath = [outPathBase '_' targetClasses{k}]; 
-  batchAnnotate(inPath, outPath, targetClasses{k});
+  batchAnnotate(inPath, outPath, targetClasses{k}, params);
 end

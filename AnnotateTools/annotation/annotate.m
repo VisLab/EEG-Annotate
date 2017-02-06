@@ -41,7 +41,7 @@ function annotData = annotate(scoreData, classLabel, params)
 %     else
 %         params.weights = weights;
 %     end
-    position = floor(length(params.weights)/2) + 1;
+    position = floor(length(params.AnnotateWeights)/2) + 1;
      
     %% Initialize the annotation structure
     annotData = getAnnotDataStructure();
@@ -68,7 +68,7 @@ function annotData = annotate(scoreData, classLabel, params)
         noNegativeShiftedScores = shiftedScores;
         noNegativeShiftedScores(shiftedScores < 0) = 0;   % remove everything below zero
 
-        if paramsAnnotateRescaleBeforeCombine
+        if params.AnnotateRescaleBeforeCombine
             nonZeroScore = noNegativeShiftedScores(noNegativeShiftedScores > 0);
             cutMax = prctile(nonZeroScore, 98);     % use percentile to scaling
             normalizedScores = noNegativeShiftedScores;
@@ -78,7 +78,7 @@ function annotData = annotate(scoreData, classLabel, params)
             normalizedScores = noNegativeShiftedScores;
         end
         %% Calculate sub-window scores and zero-out
-        wScores = getWeightedScores(normalizedScores, weights); 
+        wScores = getWeightedScores(normalizedScores, params.AnnotateWeights); 
         mScores = getMaskOutScores(wScores, position - 1, 0);   
         allScores(:, k) = mScores;
     end    
@@ -90,7 +90,7 @@ function annotData = annotate(scoreData, classLabel, params)
     end
     
     %% Make up a weighting and calculate weighted scores
-    wScores = getWeightedScores(theseScores, weights);
+    wScores = getWeightedScores(theseScores, params.AnnotateWeights);
     annotData.wScores = wScores;
     
     %% Use a greedy zero-out algorithm to take best scores
