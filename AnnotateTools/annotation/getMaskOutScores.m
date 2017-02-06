@@ -1,7 +1,7 @@
 % flag highRecall 
 %   set true: to get higher recall
 %   set false: to get higher precision
-function sNew = getMaskOutScore(s, maskPos, cutOff)
+function sNew = getMaskOutScores(s, maskPos, cutOff)
 
 s = s - cutOff;  % After this line, it is in the same way as zero-cutoff
 

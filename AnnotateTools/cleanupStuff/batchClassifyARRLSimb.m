@@ -1,4 +1,5 @@
-function outPath = batch_classify_ARTLimb(inPath_test, inPath_train, targetClass, varargin)
+function outPath = batchClassifyARRLSimb(testPaths, trainPaths, ...
+                                         outPath, targetClass, varargin)
 %   batch_classify_ARTLimb() 
 %       - estimate classification scores of samples using the ARTLimb classifier
 %       - ARTLimb classifier: ARTL classifier modified to handle imbalanced data
@@ -19,8 +20,8 @@ function outPath = batch_classify_ARTLimb(inPath_test, inPath_train, targetClass
 %                                       'fSaveTrainScore', true);
 % 
 %   Inputs:
-%       inPath_test: the pash to the test EEG datasets
-%       inPath_train: the pash to the training EEG datasets
+%       inPath_test: the path to the test EEG datasets
+%       inPath_train: the path to the training EEG datasets
 %       'targetClass': the labels of target class
 %   
 %   Optional inputs:
@@ -53,24 +54,23 @@ function outPath = batch_classify_ARTLimb(inPath_test, inPath_train, targetClass
 %
 %   Author:
 %       Kyung-min Su, The University of Texas at San Antonio, 2016
-%
+%       Kay Robbins, UTSA, 2017
 
-    %Setup the parameters and reporting for the call   
-    params = vargin2struct(varargin);  
-    outPath = '.\temp';
-    if isfield(params, 'outPath')
-        outPath = params.outPath;
-    end
-    
+    %% Setup the parameters and reporting for the call   
     if ~isdir(outPath)   % if the directory is not exist
         mkdir(outPath);  % make the new directory
     end
 
-    % go over all files and preprocess them using the specified function
-    fileList_test = dir([inPath_test filesep '*.mat']);
-    for i=1:length(fileList_test)
-        testData = load([inPath_test filesep fileList_test(i).name]);
-        scoreData = classify_ARTLimbs(testData, inPath_train, targetClass, varargin{:});
-        save([outPath filesep fileList_test(i).name], 'scoreData', '-v7.3');
+    %% Process the training and test sets
+    numTests = length(testPaths);
+    numTrain = length(trainPaths);
+    for k = 1:numTests
+        scoreData(numTrain) = getScoreDataStructure(); %#ok<AGROW>
+        [~, testName, ~] = fileparts(testPaths{k});
+        for i = 1:numTrain
+           scoreData(i) = classifyARRLSimb(testPaths{k}, ...
+                               trainPaths{i}, targetClass, varargin{:}); 
+        end
+        save([outPath filesep testName '_' targetClass], 'scoreData', '-v7.3');
     end
 end

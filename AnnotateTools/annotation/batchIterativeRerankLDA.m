@@ -1,4 +1,4 @@
-function outPath = batch_annotation(inPath, varargin)
+function outPath = batchIterativeRerankLDA(testPath, trainingPaths, outPath, classLabel, varargin)
 %   batch_annotation() 
 %       - estimate annotation scores using the annotator
 %       - the annotator uses the Fuzzy voting and adaptive cutoff
@@ -11,7 +11,6 @@ function outPath = batch_annotation(inPath, varargin)
 %                    'adaptiveCutoff1', true, ...
 %                    'adaptiveCutoff2', true, ...
 %                    'rescaleBeforeCombining', true, ...
-%                    'position', 8, ...
 %                    'weights', [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5]);
 %
 %   Inputs:
@@ -48,39 +47,44 @@ function outPath = batch_annotation(inPath, varargin)
 %           combinedScore = the array of combined scores
 %           combinedCutoff = the cutoff for the combinedScore
 %
-%   Author:
-%       Kyung-min Su, The University of Texas at San Antonio, 2016
+%   Written by: Kyung-min Su, UTSA, 2016
+%   Modified by: Kay Robbins, UTSA, 2017
 %
 
-    %Setup the parameters and reporting for the call   
-    params = vargin2struct(varargin);  
-    outPath = '.\temp';
-    if isfield(params, 'outPath')
-        outPath = params.outPath;
-    end
-    
-    if ~isdir(outPath)   % if the directory is not exist
-        mkdir(outPath);  % make the new directory
+%% If the outpath doesn't exist, make the directory 
+    if ~isdir(outPath)    
+        mkdir(outPath);   
     end
 
-    % go over all files and preprocess them using the specified function
-    fileList = dir([inPath filesep '*.mat']);
-    for i=1:length(fileList)
-        readData = load([inPath filesep fileList(i).name]);
-        annotData = annotator(readData.scoreData, i, varargin{:});
-        try 
-            fileName = [outPath filesep fileList(i).name];
-            save(fileName, 'annotData', '-v7.3');
-        catch ME
-            if strcmp(ME.identifier, 'MATLAB:save:unableToWriteToMatFile') % if filename is too long
-                delete(fileName);      % remove the error file
-                annotData.originalFileName = fileList(i).name;
-                fileName = [outPath filesep 'file_' num2str(i, '%02d') '.mat'];
-                save(fileName, 'annotData', '-v7.3');
-                fprintf('file_%02d.mat <== %s\n', i, fileList(i).name);
-            else
-                rethrow(ME);
-            end
+%% Annotate files by combining score data    
+    testData = load(testPath);
+    testData = testData.annotData;
+    [~, testName, ~] = fileparts(testData.testFileName);
+    numTrain = length(trainingPaths);  
+    scoreData(numTrain) = getScoreDataStructure(); 
+    selfMask = false(numTrain, 1);   
+    for i = 1:numTrain
+        dataTrain = load(trainingPaths{i});
+        [~, trainName, ~] = fileparts(trainingPaths{i});
+        if strcmpi(testName, trainName) == 1
+            selfMask(i) = true;
         end
+        scoreData(i) = classifyLDA(dataTest, dataTrain, ...
+                              targetClass, varargin{:});
+        scoreData(i).testFileName = testData.testFileName;
+        scoreData(i).trainFileName = trainingPaths{i};
     end
+    rankedData = struct();
+    rankedData.annotData = testData;
+    rankedData.scoreData = scoreData;
+    rankedData.selfMask = selfMask;
+    rankedData.rerankingClassifier = 'LDA';
+    numberSamples = length(scoreData(1).trueLabels);
+    scores = zeros(numberSamples, numberTrain);
+    for m = 1:numberTrain
+        scores(:, m) = scoreData(m).finalScores;
+    end
+    rankedData.rankedScores = mean(scores, 2); %#ok<STRNU>
+    outputFileName = [outPath filesep testName '_' targetClass];
+    save(outputFileName, 'rankedData', '-v7.3');
 end

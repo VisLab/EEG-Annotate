@@ -1,24 +1,35 @@
-%% get training samples 
+function [samples, labels, indices] = getTrainingData(data, targetClass)
+%% Get training target and non-target samples from dataPath, excluding overlaps
 %
-% The non-target samples do not overlap with the target samples.
-% 
-function [samples, labels] = getTrainingData(dataPath, fileName, targetClass)
-    
-    data = load([dataPath filesep fileName]);
-    
+%   Parameters:
+%       dataPath     fullpath of file containing samples and labels
+%       targetClass  label of the target class
+%       samples      relevant samples for training for target class
+%       labels       cell array of labels of the relevant training samples
+%       indices      vector containing indices of training samples
+%
+%   Non-target samples do not overlap with target samples.
+
+
+%% Extract the target samples
+    dataIndices = (1:length(data.labels))';
     targetIdx = zeros(length(data.labels), 1);
     for i=1:length(data.labels)
-        for j=1:length(data.labels{i})
-            if strcmp(data.labels{i}{j}, targetClass)
-                targetIdx(i) = 1;
+        if ~iscell(data.labels{i}) && strcmpi(data.labels{i}, targetClass)
+            targetIdx(i) = 1;
+        else
+            for j=1:length(data.labels{i})
+                if strcmpi(data.labels{i}{j}, targetClass)
+                    targetIdx(i) = 1;
+                end
             end
         end
     end
     targetSample = data.samples(:, targetIdx==1);
+    targetIndices = dataIndices(targetIdx == 1);
     
-    % exclude overlapped samples with the target samples
-    targetIdx = find(targetIdx);
-    
+%% Exclude non-target samples that overlap with the target samples
+    targetIdx = find(targetIdx);  
     excludeIdx = targetIdx;
     
     pickIdx = [];
@@ -31,7 +42,8 @@ function [samples, labels] = getTrainingData(dataPath, fileName, targetClass)
     pickIdx(pickIdx > size(data.samples, 2)) = [];
     nonTargetSample = data.samples;
     nonTargetSample(:, pickIdx) = [];
-
+    nonTargetIndices = dataIndices(pickIdx);
     samples = [nonTargetSample targetSample ];
     labels = [zeros(size(nonTargetSample, 2), 1); ones(size(targetSample, 2), 1)];  % targetClass is 1, other is 0
+    indices = [targetIndices; nonTargetIndices];
 end

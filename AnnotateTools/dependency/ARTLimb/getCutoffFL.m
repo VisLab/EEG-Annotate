@@ -5,12 +5,12 @@
 %
 % When height is about 0.6065 x (max height), the x = center + sigma or center - sigma.
 % Assumption: the minor (positive) class has the higher score than the major (negative) class
-function [cutOff, mu1, sigma1, mu2, sigma2, xgrid] = getCutoff_FL(X, maxLoop, cutOffdefault)
+function [cutOff, mu1, sigma1, mu2, sigma2, xgrid] = getCutoffFL(X, maxLoop, cutOffdefault)
 
     sigmaG = std(X); % global sigma
     
     % detect the peak
-    [peak_x, peak_y, peak_i, counts, xgrid] = getLargestPeak_new(X);
+    [peak_x, peak_y, peak_i, counts, xgrid] = getLargestPeak(X);
     
     % fitting major curve on the peak
     mu1 = peak_x;

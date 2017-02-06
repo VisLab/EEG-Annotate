@@ -1,17 +1,14 @@
-function outPath = batch_plot_true_in_wing(inPath, varargin)
+function outPath = ...
+    batch_plot_true_in_wing(inPath, outPath, varargin)
 %% Generate plots showing the true events around the detected samples
 %
 %  Parameters:
-%       inPat: the pash to the annotation scores
+%       inPat: the path to the annotation scores
 %       outPath: the path to the place where the generated plots is saved
 %
 
     %Setup the parameters and reporting for the call   
     params = vargin2struct(varargin);  
-    outPath = '.\temp';
-    if isfield(params, 'outPath')
-        outPath = params.outPath;
-    end
     timingTolerances = 0:7;
     if isfield(params, 'timingTolerances')
         timingTolerances = params.timingTolerances;

@@ -2,7 +2,7 @@
 %
 % apply smooth and find the largest peak
 %
-function [peak_x, peak_y, peak_i, smoothCounts, xgrids] = getLargestPeak_new(X)
+function [peak_x, peak_y, peak_i, smoothCounts, xgrids] = getLargestPeak(X)
 
     binNumbs = [10 20 25 50 100];   % because histograms sometimes are not smoooth, 
                                     % to get stable results, use more than one histogram with differnet bin numbers.

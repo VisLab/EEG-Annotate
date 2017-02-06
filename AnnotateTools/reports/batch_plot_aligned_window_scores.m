@@ -1,19 +1,10 @@
-function outPath = batch_plot_aligned_window_scores(inPath, varargin)
+function outPath = batch_plot_aligned_window_scores(inPath, outPath, targetClasses, varargin)
 
-    %Setup the parameters and reporting for the call   
+    %Setup the parameters and reporting for the call 
     params = vargin2struct(varargin);  
-    outPath = '.\temp';
-    if isfield(params, 'outPath')
-        outPath = params.outPath;
-    end
     excludeSelf = true;     % when training data and test data are same
     if isfield(params, 'excludeSelf')
         excludeSelf = params.excludeSelf;
-    end
-    if isfield(params, 'targetClasses')
-        targetClasses = params.targetClasses;
-    else
-        error('Target class must be specified');
     end
     neighborSize = 10;
     if isfield(params, 'neighborSize')
