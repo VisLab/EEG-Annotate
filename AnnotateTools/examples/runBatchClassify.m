@@ -16,8 +16,8 @@ testPaths = getFiles('FILES', testDir, '.mat');
 rng('default'); % to reproduce results, keep use the same random seed
 
 %% Perform the classification
-for n = 1%:length(targetClassifiers)
-    for k = 1%:length(targetClasses)
+for n = 1:length(targetClassifiers)
+    for k = 1:length(targetClasses)
       outPath = [outPathBase '_' targetClassifiers{n} '_' targetClasses{k}]; 
       batchClassify(testPaths, trainPaths, outPath, ...
                     targetClasses{k}, targetClassifiers{n}, params);

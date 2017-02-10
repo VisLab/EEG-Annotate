@@ -1,70 +1,94 @@
-function figh = plotWings(annotData, varargin)
+function figh = plotWings(annotData, outPath, params)
 %% Generate plots showing the true events around the detected samples
 %
 %  Parameters:
 %       inPat: the path to the annotation scores
 %       outPath: the path to the place where the generated plots is saved
 %
+%% Setup the parameters and reporting for the call
+    params = processAnnotateParameters('plotWings', nargin, 2, params);
+    plotSize = params.wingPlotSize;
+    subwindowPlotOffset = round((plotSize - 1)/2);
+    rankCutoff = params.wingRankCutoff;
+  
+%     %Setup the parameters and reporting for the call   
+%     params = vargin2struct(varargin);
+%     outPath = [];
+%     if isfield(params, 'outPath')
+%         outPath = params.outPath;
+%     end
+%     
+%     timingTolerances = 0:7;
+%     if isfield(params, 'timingTolerances')
+%         timingTolerances = params.timingTolerances;
+%     end
+%     
+%     trueInWings = true;
+%     if isfield(params, 'trueInWings')
+%         trueInWings = params.trueInWings;
+%     end
 
-    %Setup the parameters and reporting for the call   
-    params = vargin2struct(varargin);
-    outPath = [];
-    if isfield(params, 'outPath')
-        outPath = params.outPath;
-    end
-    
-    timingTolerances = 0:7;
-    if isfield(params, 'timingTolerances')
-        timingTolerances = params.timingTolerances;
-    end
-    
-    trueInWings = true;
-    if isfield(params, 'trueInWings')
-        trueInWings = params.trueInWings;
-    end
-    subwindowOffset = 16;  %    2 seconds if subwindow is 125 ms
-    if isfield(params, 'subwindowOffset')
-        subwindowOffset = params.subwindowOffset;
-    end
-    
-    plotSize = 2*subwindowOffset + 1; % Number subwindows in plot 
     
     %% Set up the parameters for the plot
     [~, theName, ~] = fileparts(annotData.testFileName);
     theTitle = [theName ': classifier=' annotData.classifier ...
                ' class= ' annotData.classLabel];
     cmap = [1.0, 0.0, 0.0       % red1:  'Foe w/ CR'
-            1.0, 0.7, 0.4       % red2 (orange):  'Foe w/ IR'
+         %   1.0, 0.7, 0.4       % red2 (orange):  'Foe w/ IR'
         1.0, 0.4, 1.0       % red3 (pink):  'Foe w/ NR'
         0.2, 0.3, 1.0       % blue1: 'Friend w/ CR'
         0.0, 0.9, 1.0       % blue2: 'Friend w/ IR'
-        0.5, 0.5, 1.0       % blue3: 'Friend w/ NR'
+        %0.5, 0.5, 1.0       % blue3: 'Friend w/ NR'
         0.0, 0.0, 0.0       % black: false positive (peak, but no event around there)
         1.0, 1.0 1.0];      % white:  background, low (or 0) score
-    colorbarTickLabels = {'Foe w/ CR', ...          % 1
-        'Foe w/ IR', ...        % 2
-        'Foe w/ NR', ...        % 3
-        'Friend w/ CR', ...     % 4
-        'Friend w/ IR', ...     % 5
-        'Friend w/ NR', ...     % 6
-        'No event', ...   % 7
-        'Low score'};           % 8    ==> zero-out score 
-    
+    colorbarTickLabels = { ...
+        'C<W,T<R', ...   % 1
+        '0<W<=C,T<R', ...   % 1
+         ...        % 2%'Foe w/ NR', ...        % 3
+        'C<W,0<R<=T', ...     % 3 %'Friend w/ IR', ...     % 5%'Friend w/ NR', ...     % 6
+        '0<W<=C,0<R<=T', ...
+        '0<W,R=0', ...  5
+        'Low score'};           % 6    ==> zero-out score 
+    lowScore = length(colorbarTickLabels);
     xTickLabel = cell(plotSize, 1);
     for n = 1:2:plotSize
-        xTickLabel{n} = num2str(n - subwindowOffset - 1);
+        xTickLabel{n} = num2str(n - subwindowPlotOffset - 1);
     end
     
-    %% go over all files and preprocess them using the specified function 
-    trueLabels = annotData.trueLabels;
-    plotLabels = convertTrue2Plot(trueLabels);
-    centerIndex = find(annotData.wmScores > 0);
-    if trueInWings
-        plotData = generatePlotDataTrueWings(plotLabels, centerIndex, timingTolerances);
-    else
-        plotData = generatePlotData(plotLabels, centerIndex);
+    %% go over all files and preprocess them using the specified function
+    plotLabels = ones(size(annotData.wmScores)) * lowScore;  
+    centerMask = annotData.wmScores > params.wingBaseThreshold;
+    cutoffMask = annotData.wmScores > annotData.combinedCutoff;
+    plotLabels(centerMask) = lowScore - 1;
+    plotLabels(cutoffMask) = lowScore - 2;
+    if isfield(annotData, 'rankCounts')
+        sampleIndex = annotData.sampleIndex;
+        tempMask = false(size(centerMask));
+        rankedBaseIndex = sampleIndex(annotData.rankCounts > 0);
+        rankedBaseMask = tempMask;
+        rankedBaseMask(rankedBaseIndex) = true;
+        rankedHighIndex = sampleIndex(annotData.rankCounts > rankCutoff);
+        rankedHighMask = tempMask;
+        rankedHighMask(rankedHighIndex) = true;
+        plotLabels(~rankedBaseMask & centerMask) = lowScore - 1;
+        plotLabels(rankedHighMask & centerMask) = lowScore - 2;
+        plotLabels(~rankedHighMask & centerMask & rankedBaseMask) = lowScore - 3;
+        plotLabels(~rankedHighMask & cutoffMask & rankedBaseMask & centerMask) = lowScore - 4;
+        plotLabels(rankedHighMask & centerMask & ~cutoffMask) = lowScore - 5;
+        plotLabels(rankedHighMask & cutoffMask & centerMask) = lowScore - 6;
     end
-    [~, sIdx] = sort(annotData.wmScores(centerIndex), 'descend');
+    centerIndex = find(centerMask);    
+    plotData = generatePlotData(plotLabels, centerIndex);
+    wmData = annotData.wmScores(centerMask);
+    wmData = wmData(:);
+    sortCols = -1;
+    if isfield(annotData, 'rankCounts')
+        rankedData = annotData.rankCounts;
+        wmData = [wmData, rankedData(:)];
+        sortCols = [-2, -1];
+    end
+        
+    [~, sIdx] = sortrows(wmData, sortCols);
     sortData = plotData(sIdx, :);
     
     figh = figure;
@@ -95,134 +119,133 @@ function figh = plotWings(annotData, varargin)
     end
     
     %% Now output the predictions
-    centerData = sortData(:, subwindowOffset+1);
-    CRa = sum(centerData==1);
-    IRa = sum(centerData==2);
-    NRa = sum(centerData==3);
-    CRb = sum(centerData==4);
-    IRb = sum(centerData==5);
-    NRb = sum(centerData==6);
-    NoEvent = sum(centerData==7);
-    LowScore = sum(centerData==8);
-    fprintf('Predicted positives %s:\n', theName);
-    fprintf('   CRa=%d, IRa=%d, NRa=%d, CRb=%d, IRb=%d, NRb=%d\n', ...
-            CRa, IRa, NRa, CRb, IRb, NRb);
-    fprintf('   No event=%d, Low score=%d, Fraction foe=%.2f, Fraction friend=%.2f\n', ...
-         NoEvent, LowScore, sum(CRa+IRa+NRa)/length(centerData), sum(CRb+IRb+NRb)/length(centerData));
-    numbPositives = sum(annotData.wmScores > annotData.combinedCutoff);
-    centerData = sortData(1:numbPositives, subwindowOffset + 1);
-    CRa = sum(centerData==1);
-    IRa = sum(centerData==2);
-    NRa = sum(centerData==3);
-    CRb = sum(centerData==4);
-    IRb = sum(centerData==5);
-    NRb = sum(centerData==6);
-    NoEvent = sum(centerData==7);
-    LowScore = sum(centerData==8);
-    fprintf('Predicted positives above the cutoff %s: \n', theName);
-    fprintf('   CRa=%d, IRa=%d, NRa=%d, CRb=%d, IRb=%d, NRb=%d\n', ...
-            CRa, IRa, NRa, CRb, IRb, NRb);
-    fprintf('   No event=%d, Low score=%d, Fraction foe=%.2f, Fraction friend=%.2f\n', ...
-         NoEvent, LowScore, sum(CRa+IRa+NRa)/length(centerData), sum(CRb+IRb+NRb)/length(centerData));
+%     centerData = sortData(:, subwindowPlotOffset+1);
+%     CRa = sum(centerData==1);
+%     IRa = sum(centerData==2);
+%     NRa = sum(centerData==3);
+%     CRb = sum(centerData==4);
+%     IRb = sum(centerData==5);
+%     NRb = sum(centerData==6);
+%     NoEvent = sum(centerData==7);
+%     LowScore = sum(centerData==8);
+%     fprintf('Predicted positives %s:\n', theName);
+%     fprintf('   CRa=%d, IRa=%d, NRa=%d, CRb=%d, IRb=%d, NRb=%d\n', ...
+%             CRa, IRa, NRa, CRb, IRb, NRb);
+%     fprintf('   No event=%d, Low score=%d, Fraction foe=%.2f, Fraction friend=%.2f\n', ...
+%          NoEvent, LowScore, sum(CRa+IRa+NRa)/length(centerData), sum(CRb+IRb+NRb)/length(centerData));
+%     numbPositives = sum(annotData.wmScores > annotData.combinedCutoff);
+%     centerData = sortData(1:numbPositives, subwindowPlotOffset + 1);
+%     CRa = sum(centerData==1);
+%     IRa = sum(centerData==2);
+%     NRa = sum(centerData==3);
+%     CRb = sum(centerData==4);
+%     IRb = sum(centerData==5);
+%     NRb = sum(centerData==6);
+%     NoEvent = sum(centerData==7);
+%     LowScore = sum(centerData==8);
+%     fprintf('Predicted positives above the cutoff %s: \n', theName);
+%     fprintf('   CRa=%d, IRa=%d, NRa=%d, CRb=%d, IRb=%d, NRb=%d\n', ...
+%             CRa, IRa, NRa, CRb, IRb, NRb);
+%     fprintf('   No event=%d, Low score=%d, Fraction foe=%.2f, Fraction friend=%.2f\n', ...
+%          NoEvent, LowScore, sum(CRa+IRa+NRa)/length(centerData), sum(CRb+IRb+NRb)/length(centerData));
     
-    function plotData = generatePlotDataTrueWings(plotLabels, centerIndex, timingTolerances)
-    % initial values is 8 (Low score)
-        plotData = ones(length(centerIndex), plotSize)*8;     
-        for i = 1:length(centerIndex)
-            [bIn, idx] = isInRange2(plotLabels, centerIndex(i), 8, timingTolerances);
-            if bIn
-                plotData(i, :) = copyLabels(plotLabels, idx);
-            else
-                plotData(i, :) = copyLabels(plotLabels, centerIndex(i));
-                plotData(i, subwindowOffset + 1) = 7;     % no event
-            end
-        end
-    end
+%     function plotData = generatePlotDataTrueWings(plotLabels, centerIndex, timingTolerances)
+%     % initial values is 8 (Low score)
+%         plotData = ones(length(centerIndex), plotSize)*8;     
+%         for i = 1:length(centerIndex)
+%             [bIn, idx] = isInRange2(plotLabels, centerIndex(i), 8, timingTolerances);
+%             if bIn
+%                 plotData(i, :) = copyLabels(plotLabels, idx);
+%             else
+%                 plotData(i, :) = copyLabels(plotLabels, centerIndex(i));
+%                 plotData(i, subwindowPlotOffset + 1) = 7;     % no event
+%             end
+%         end
+%     end
 
    function plotData = generatePlotData(plotLabels, centerIndex)
     % initial values is 8 (Low score)
-        plotData = ones(length(centerIndex), plotSize)*8;     
+        plotData = ones(length(centerIndex), plotSize)*lowScore;     
         for i = 1:length(centerIndex)
                 plotData(i, :) = copyLabels(plotLabels, centerIndex(i));
         end
     end
 
     function newData = copyLabels(data, idx)
-        newData = ones(1, plotSize) * 8;    % one row vector    
-        srcStart = max(1, idx - subwindowOffset);
-        srcEnd = min(length(data), idx + subwindowOffset);   
-        destStart = max(1, subwindowOffset + 2 - idx);
-        destEnd = min(length(newData), subwindowOffset + 1 + length(data) - idx);   
+        newData = ones(1, plotSize) * lowScore;    % one row vector    
+        srcStart = max(1, idx - subwindowPlotOffset);
+        srcEnd = min(length(data), idx + subwindowPlotOffset);   
+        destStart = max(1, subwindowPlotOffset + 2 - idx);
+        destEnd = min(length(newData), subwindowPlotOffset + 1 + length(data) - idx);   
         newData(destStart:destEnd) = data(srcStart:srcEnd);
     end
 
-    function [bIn, idx] = isInRange2(labels, curIdx, targetID, timingTolerances)
-    % if targetID is not exist in labels with the range (from -offLeft to +offRight of curIdx)
-        startIdx = max(1, curIdx - timingTolerances);
-        endIdx = min(length(labels), curIdx + timingTolerances);
-        idx = find(labels(startIdx:endIdx) ~= targetID);
-        if ~isempty(idx)
-            bIn = true;
-            idx = startIdx + idx(1) - 1;
-        else
-            bIn = false;
-            idx = curIdx;
-        end
-    end
+%     function [bIn, idx] = isInRange2(labels, curIdx, targetID, timingTolerances)
+%     % if targetID is not exist in labels with the range (from -offLeft to +offRight of curIdx)
+%         startIdx = max(1, curIdx - timingTolerances);
+%         endIdx = min(length(labels), curIdx + timingTolerances);
+%         idx = find(labels(startIdx:endIdx) ~= targetID);
+%         if ~isempty(idx)
+%             bIn = true;
+%             idx = startIdx + idx(1) - 1;
+%         else
+%             bIn = false;
+%             idx = curIdx;
+%         end
+%     end
+% 
+%     function plotLabels = convertTrue2Plot(trueLabels)
+%      %% Convert the original labels to labels encoded by response type   
+%         plotLabels = ones(size(trueLabels)) * 8;    % initial values is 8 (Low score)
+%         for s = 1:length(trueLabels)
+%             if ~isempty(trueLabels{s})
+%                 for i = 1:length(trueLabels{s})
+%                     if strcmp(trueLabels{s}{i}, '34')  % friend
+%                         if isInRange(trueLabels, s, '38')  % inspect if there is correct response in 2 seconds
+%                             plotLabels(s) = 4;
+%                         elseif isInRange(trueLabels, s, '39')  % incorrect response in 2 second
+%                             plotLabels(s) = 5;
+%                         else    % no response
+%                             plotLabels(s) = 6;
+%                         end
+%                     elseif strcmp(trueLabels{s}{i}, '35')  % foe
+%                         if isInRange(trueLabels, s, '38')  % inspect if there is correct response in 2 seconds
+%                             plotLabels(s) = 1;
+%                         elseif isInRange(trueLabels, s, '39')  % incorrect response in 2 second
+%                             plotLabels(s) = 2;
+%                         else   % no response
+%                             plotLabels(s) = 3;
+%                         end
+%                     end
+%                 end
+%             end
+%         end
+%     end
 
-    function plotLabels = convertTrue2Plot(trueLabels)
-        
-        plotLabels = ones(size(trueLabels)) * 8;    % initial values is 8 (Low score)
-        for s=1:length(trueLabels)
-            if ~isempty(trueLabels{s})
-                for i=1:length(trueLabels{s})
-                    if strcmp(trueLabels{s}{i}, '34')  % friend
-                        if isInRange(trueLabels, s, '38')  % inspect if there is correct response in 2 seconds
-                            plotLabels(s) = 4;
-                        elseif isInRange(trueLabels, s, '39')  % incorrect response in 2 second
-                            plotLabels(s) = 5;
-                        else    % no response
-                            plotLabels(s) = 6;
-                        end
-                    elseif strcmp(trueLabels{s}{i}, '35')  % foe
-                        if isInRange(trueLabels, s, '38')  % inspect if there is correct response in 2 seconds
-                            plotLabels(s) = 1;
-                        elseif isInRange(trueLabels, s, '39')  % incorrect response in 2 second
-                            plotLabels(s) = 2;
-                        else   % no response
-                            plotLabels(s) = 3;
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-
-    function [bIn, idx] = isInRange(labels, curIdx, targetID)
-   % if targetID is exist in labels with the range (from -offLeft to +offRight of curIdx)
-        startIdx = max(1, curIdx);
-        endIdx = min(length(labels), curIdx + subwindowOffset);
-
-        idx = [];
-        for s = startIdx:endIdx
-            if ~isempty(labels{s})
-                for i=1:length(labels{s})
-                    if strcmp(labels{s}{i}, targetID)
-                        idx = cat(1, idx, s);
-                    end
-                end
-            end
-        end
-
-        if ~isempty(idx)
-            bIn = true;
-            idx = idx(1);
-        else
-            bIn = false;
-            idx = curIdx;
-        end
-    end
+%     function [bIn, idx] = isInRange(labels, curIdx, targetID)
+%    % if targetID is exist in labels with the range (from -offLeft to +offRight of curIdx)
+%         startIdx = max(1, curIdx);
+%         endIdx = min(length(labels), curIdx + subwindowPlotOffset);
+% 
+%         idx = [];
+%         for s = startIdx:endIdx
+%             if ~isempty(labels{s})
+%                 for i=1:length(labels{s})
+%                     if strcmp(labels{s}{i}, targetID)
+%                         idx = cat(1, idx, s);
+%                     end
+%                 end
+%             end
+%         end
+% 
+%         if ~isempty(idx)
+%             bIn = true;
+%             idx = idx(1);
+%         else
+%             bIn = false;
+%             idx = curIdx;
+%         end
+%     end
 
 end    
     

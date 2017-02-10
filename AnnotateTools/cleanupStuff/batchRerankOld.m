@@ -1,4 +1,4 @@
-function outPath = batchIterativeRerankLDA(testPath, trainingPaths, outPath, classLabel, varargin)
+function outPath = batchRerank(inPath, outPath, classLabel, varargin)
 %   batch_annotation() 
 %       - estimate annotation scores using the annotator
 %       - the annotator uses the Fuzzy voting and adaptive cutoff
@@ -56,35 +56,17 @@ function outPath = batchIterativeRerankLDA(testPath, trainingPaths, outPath, cla
         mkdir(outPath);   
     end
 
-%% Annotate files by combining score data    
-    testData = load(testPath);
-    testData = testData.annotData;
-    [~, testName, ~] = fileparts(testData.testFileName);
-    numTrain = length(trainingPaths);  
-    scoreData(numTrain) = getScoreDataStructure(); 
-    selfMask = false(numTrain, 1);   
-    for i = 1:numTrain
-        dataTrain = load(trainingPaths{i});
-        [~, trainName, ~] = fileparts(trainingPaths{i});
-        if strcmpi(testName, trainName) == 1
-            selfMask(i) = true;
-        end
-        scoreData(i) = classifyLDA(dataTest, dataTrain, ...
-                              targetClass, varargin{:});
-        scoreData(i).testFileName = testData.testFileName;
-        scoreData(i).trainFileName = trainingPaths{i};
+%% Annotate files by combining score data
+    fileList = dir([inPath filesep '*.mat']);
+    for k = 1:length(fileList)
+        thisFile = [inPath filesep fileList(k).name];
+        fprintf('Annotating %s ...\n', thisFile);
+        load(thisFile);
+        %% Remove the test file from the training data if present
+        trainFiles = {scoreData.trainFileName};
+        trainMask = strcmpi(trainFiles, scoreData(1).testFileName);
+        annotData = annotate(scoreData(~trainMask), classLabel, varargin{:}); %#ok<NASGU>
+        fileName = [outPath filesep fileList(k).name];
+        save(fileName, 'annotData', '-v7.3');
     end
-    rankedData = struct();
-    rankedData.annotData = testData;
-    rankedData.scoreData = scoreData;
-    rankedData.selfMask = selfMask;
-    rankedData.rerankingClassifier = 'LDA';
-    numberSamples = length(scoreData(1).trueLabels);
-    scores = zeros(numberSamples, numberTrain);
-    for m = 1:numberTrain
-        scores(:, m) = scoreData(m).finalScores;
-    end
-    rankedData.rankedScores = mean(scores, 2); %#ok<STRNU>
-    outputFileName = [outPath filesep testName '_' targetClass];
-    save(outputFileName, 'rankedData', '-v7.3');
 end

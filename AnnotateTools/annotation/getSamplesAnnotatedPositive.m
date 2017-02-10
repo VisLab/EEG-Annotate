@@ -1,5 +1,5 @@
 function annotData = getSamplesAnnotatedPositive(annotData, samples, ...
-                                           labels, classLabel, tolerance)
+                                                 labels, classLabel, params)
 %% Extracts the positive samples from a classified dataset for reranking
 %
 %  Parameters:
@@ -10,15 +10,17 @@ function annotData = getSamplesAnnotatedPositive(annotData, samples, ...
 %     
 %
 %%  Get the samples annotated as positive
+    params = processAnnotateParameters('getSamplesAnnotatedPositive', ...
+                                        nargin, 4, params);
     sampleMask = annotData.wmScores > 0;
     [sampleIndex, timeTolerance, nearestEvent] = ...
                 getTimingTolerance(sampleMask, labels, classLabel);
     annotData.samples = samples(:, sampleMask);
     labels = cell(length(sampleIndex), 1);
-    hitMask = abs(timeTolerance) <= tolerance;
+    hitMask = abs(timeTolerance) <= params.subwindowTolerance;
     labels(hitMask) = {classLabel};
     annotData.labels = labels;
-    annotData.tolerance = tolerance;
+    annotData.subwindowTolerance = params.subwindowTolerance;
     annotData.sampleIndex = sampleIndex;
     annotData.timeTolerance = timeTolerance;
     annotData.nearestEvent = nearestEvent;

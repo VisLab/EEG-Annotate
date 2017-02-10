@@ -1,72 +1,74 @@
-function outPath = batchRerank(inPath, outPath, classLabel, varargin)
-%   batch_annotation() 
-%       - estimate annotation scores using the annotator
-%       - the annotator uses the Fuzzy voting and adaptive cutoff
+function outputFileNames = batchRerank(testPaths, trainPaths, outPath, ...
+                                     targetClass, targetClassifier, params)
+%% Estimate classification scores of samples using the ARRLS classifier
+%  
+%  Parameters:
+%       inPat: the pash to the data (samples and classes)
+%       outPath: the path to the place where estimated scores are saved
 %
-%   Example:
-%       outPath = batch_annotation('.\pathIn');
-%       outPath = batch_annotation('.\pathIn', ...
-%                    'outPath', '.\pathOut', ...
-%                    'excludeSelf', true, ...
-%                    'adaptiveCutoff1', true, ...
-%                    'adaptiveCutoff2', true, ...
-%                    'rescaleBeforeCombining', true, ...
-%                    'weights', [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5]);
-%
-%   Inputs:
-%       inPath: the pash to the classification scores
-%   
-%   Optional inputs:
-%       'outPath': the path to the place where estimated annotation scores will be saved. (default: '.\temp')
-%       'excludeSelf', when we use the same datasets for training and test, 
-%                      if this flag is true, the test set is excluded from the training set.
-%                      If the flag is false, it uses all training sets for annotaion.
-%       'adaptiveCutoff1', option to use the adaptive cutoff on the classfication scores
-%       'adaptiveCutoff2', option to use the adaptive cutoff on the combined scores
-%       'rescaleBeforeCombining', if true, normalize scores so that they are in 0 to 1 range, before combining
-%       'position', the center of re-weighting area
-%       'weights',  the weights of scores
-%
-%   Output:
-%       outPath: the path to the place where annotation scores were saved
-%
-%   Note:
-%       It stores estimated classification scores using the annotData structure. 
-%       annotData structure has eight fields.
-%           testLabel: the cell containing the true labels of test samples
-%           predLabel: the cell containing the predicted labels of test samples
-%           testInitProb: the cell containing the intial scores 
-%           testInitCutoff: the array of intial cutoff
-%           testFinalScore: the cell containing the final scores 
-%           testFinalCutoff: the array of final cutoff
-%           trainLabel: the cell containing the true labels of training samples
-%           trainScore: the cell containing the scores of training samples
-%           allScores: the 2D matrix containing scores for combining.
-%                       scores have been normalized, weighted and mask-outed.
-%                       allScores = [number of samples x number of training sets]
-%           combinedScore = the array of combined scores
-%           combinedCutoff = the cutoff for the combinedScore
-%
-%   Written by: Kyung-min Su, UTSA, 2016
-%   Modified by: Kay Robbins, UTSA, 2017
-%
+    %% Set up the defaults and process the input arguments
+    params = processAnnotateParameters('batchRerank', nargin, 5, params);
 
-%% If the outpath doesn't exist, make the directory 
-    if ~isdir(outPath)    
-        mkdir(outPath);   
+    %% Make sure that the outPath exists, if not make the directory
+    if ~exist(outPath, 'dir')
+      mkdir(outPath);
     end
 
-%% Annotate files by combining score data
-    fileList = dir([inPath filesep '*.mat']);
-    for k = 1:length(fileList)
-        thisFile = [inPath filesep fileList(k).name];
-        fprintf('Annotating %s ...\n', thisFile);
-        load(thisFile);
-        %% Remove the test file from the training data if present
-        trainFiles = {scoreData.trainFileName};
-        trainMask = strcmpi(trainFiles, scoreData(1).testFileName);
-        annotData = annotate(scoreData(~trainMask), classLabel, varargin{:}); %#ok<NASGU>
-        fileName = [outPath filesep fileList(k).name];
-        save(fileName, 'annotData', '-v7.3');
+    %% Process the training-test set pairs using the LDA classifier
+    numTests = length(testPaths);
+    numTrain = length(trainPaths);
+    outputFileNames = cell(numTests, 1);
+    for k = 1:numTests
+        if params.verbose
+            fprintf('%s class:%s test set: %s\n', targetClassifier, ...
+                targetClass, testPaths{k});
+        end
+        scoreData(numTrain) = getScoreDataStructure(); %#ok<AGROW>
+        
+        %% Load the test data
+        dataRead = load(testPaths{k});
+        dataTest.labels = dataRead.annotData.labels;
+        dataTest.samples = dataRead.annotData.samples;
+        annotData = dataRead.annotData; 
+        [~, baseName, ~] = fileparts(annotData.testFileName);
+        [~, testName, ~] = fileparts(testPaths{k});
+        selfMask = false(length(numTrain), 1);
+        for i = 1:numTrain
+            if params.verbose
+                fprintf('   train set: %s\n', trainPaths{i});
+            end
+            dataTrain = load(trainPaths{i});
+            switch lower(targetClassifier)
+                case 'lda'
+                    scoreData(i) = classifyLDA(dataTest, dataTrain, ...
+                        targetClass, params);
+                case 'arrls'
+                    scoreData(i) = classifyARRLS(dataTest, dataTrain, ...
+                        targetClass, params);
+                case 'arrlsimb'
+                    scoreData(i) = classifyARRLSimb(dataTest, dataTrain, ...
+                        targetClass, params);
+                case 'arrlsmod'
+                    scoreData(i) = classifyARRLSMod(dataTest, dataTrain, ...
+                        targetClass, params); 
+                otherwise
+                    error('batchClassify:BadClassifier', ...
+                        'Classifier %s is not supported', targetClassifier);
+            end
+            scoreData(i).testFileName = testPaths{k};
+            scoreData(i).trainFileName = trainPaths{i};
+            [~, trainName, ~] = fileparts(trainPaths{i});
+            selfMask(i) = strcmpi(trainName, baseName);
+        end
+        rankScoreData = scoreData(~selfMask);
+        rankCounts = rankScoreData(1).finalScores > rankScoreData(1).finalCutoff;
+        for n = 2:length(rankScoreData)
+            rankCounts = rankCounts + ...
+                (rankScoreData(n).finalScores > rankScoreData(n).finalCutoff);
+        end
+        annotData.rankCounts = rankCounts;
+        outputFileNames{k} = [outPath filesep testName '_' targetClass];
+        save(outputFileNames{k}, 'scoreData', 'annotData', '-v7.3');
     end
 end
+            

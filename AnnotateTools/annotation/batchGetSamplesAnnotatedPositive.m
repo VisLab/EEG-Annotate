@@ -1,5 +1,5 @@
 function [] = batchGetSamplesAnnotatedPositive(inPath, outPath, ...
-                                   classLabel, tolerance, varargin)
+                                   classLabel, params)
 %% Create training sets of positive samples for iterative reranking
 %
 %   
@@ -8,19 +8,23 @@ function [] = batchGetSamplesAnnotatedPositive(inPath, outPath, ...
 %
 
 %% Set the options for the paths
-    params = vargin2struct(varargin); 
-    
-    %% Set revised test path if data has been moved
-    testPathBase = [];
-    if isfield(params, 'testPathBase')
-        testPathBase = params.testPathBase;
-    end
-    
+%     params = vargin2struct(varargin); 
+%     
+%     %% Set revised test path if data has been moved
+%     testPathBase = [];
+%     if isfield(params, 'testPathBase')
+%         testPathBase = params.testPathBase;
+%     end
+
+    %% Set up the defaults and process the input arguments
+    params = processAnnotateParameters('batchGetSamplesAnnotatedPositive', ...
+                                        nargin, 3, params);
 %% If the outpath doesn't exist, make the directory  
     if ~isdir(outPath)
         mkdir(outPath);
     end
 
+    testPathBase = [];
 %% Create new test set from samples annotated with classLabel
 fileList = dir([inPath filesep '*.mat']);
 for k = 1:length(fileList)
@@ -42,7 +46,7 @@ for k = 1:length(fileList)
     testData = load(testFile);
     annotData = getSamplesAnnotatedPositive(annotData, ...
                                     testData.samples, testData.labels, ...
-                                    classLabel, tolerance); %#ok<NASGU>
+                                    classLabel, params); %#ok<NASGU>
     outFileName = [outPath filesep testName '_positive_' classLabel testExt]; 
     save(outFileName, 'annotData', '-v7.3');
 end
