@@ -38,6 +38,10 @@ function outputFileNames = batchRerank(testPaths, trainPaths, outPath, ...
                 fprintf('   train set: %s\n', trainPaths{i});
             end
             dataTrain = load(trainPaths{i});
+            if params.rerankPositive
+                dataTrain.samples = dataTrain.annotData.samples;
+                dataTrain.labels = dataTrain.annotData.labels;
+            end
             switch lower(targetClassifier)
                 case 'lda'
                     scoreData(i) = classifyLDA(dataTest, dataTrain, ...

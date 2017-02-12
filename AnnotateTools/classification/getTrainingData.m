@@ -44,6 +44,12 @@ function [samples, labels, indices] = getTrainingData(data, targetClass)
     nonTargetSample(:, pickIdx) = [];
     nonTargetIndices = dataIndices(pickIdx);
     samples = [nonTargetSample targetSample ];
+    if size(nonTargetSample, 2) == 0 
+        warning('Data has no non-target samples');
+    end
+    if size(targetSample, 2) == 0 
+        warning('Data has no target samples');
+    end
     labels = [zeros(size(nonTargetSample, 2), 1); ones(size(targetSample, 2), 1)];  % targetClass is 1, other is 0
     indices = [targetIndices; nonTargetIndices];
 end

@@ -18,7 +18,7 @@
 inPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower';
 outPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower';
 inType = '_reranked_ARRLSMod_';
-outType = '_reranked_ARRLSMod__WingsBig_';
+outType = '_reranked_ARRLSMod__WingsBigA_';
 % inType = '_Annotation_';
 % outType = '_Annotation_Wings_';
 targetClasses = {'34', '35'};

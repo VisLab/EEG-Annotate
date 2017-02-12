@@ -10,6 +10,14 @@ targetClasses = {'34', '35'};
 targetClassifiers = {'ARRLSMod', 'ARRLSimb'};
 params = struct();
 
+%% Set up the directories for BCIT
+trainDir = 'D:\Research\Annotate\Kyung\Data\VEP_PREP_ICA_VEP2_MARA_averagePower';
+testDir = 'D:\Research\Annotate\Kyung\Data\BCIT_ESS_PREP_ICA_BCIT2_MARA_averagePower';
+outPathBase = 'D:\Research\Annotate\Kay\Data1\BCIT_ESS_PREP_ICA_BCIT2_MARA_averagePower';
+targetClasses = {'34', '35'};
+targetClassifiers = {'LDA', 'ARRLS', 'ARRLSMod', 'ARRLSimb'};
+params = struct();
+
 %% Get the full paths of test and training files
 trainPaths = getFiles('FILES', trainDir, '.mat');
 testPaths = getFiles('FILES', testDir, '.mat');
