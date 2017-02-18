@@ -1,16 +1,23 @@
-%  dataDir = 'D:\Research\Annotate\Kyung\Data\VEP_PREP_ICA_VEP2_MARA_averagePower';
-%  annotDir = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_ARTLimb_Annotation_34';
-%  
-% data = load([dataDir filesep 'vep_01.mat']);
-% load([annotDir filesep 'vep_01_34.mat']);
 function [sampleIndex, timeTolerance, nearestEvent] = ...
-        getTimingTolerance(sampleMask, labels, classLabel)
+                     getTimingTolerance(labels, classLabel, sampleMask)
+%% Compute the distance to the nearest subwindow containing classLabel
+%
+%  Parameters:
+%      labels        cell array of labels
+%      classLabel   label to determine closeness to
+%      sampleMask   mask giving all the samples to be considered
+%
+%  Output:
+%      sampleIndex   index of this event in original labels
+%      timeTolerance distance of this event to nearest classLabel
+%      nearestEvent  index of nearest classLabel event.
 % Return the closest event of classLabel in labels
 
 %% Initialize the data structures
     sampleIndex = (1:length(sampleMask))';
     sampleIndex = sampleIndex(sampleMask);
     timeTolerance = inf(size(sampleIndex));
+    eventType = cell(size(sampleIndex));
     nearestEvent = zeros(size(sampleIndex));
     [~, classIndex] = getClassMask(labels, classLabel);
     lastIndex = 1;

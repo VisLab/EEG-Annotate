@@ -1,5 +1,5 @@
 function outPath = batchAnnotate(inPath, outPath, classLabel, params)
-%   batch_annotation() 
+%  Combines scores to annotate
 %       - estimate annotation scores using the annotator
 %       - the annotator uses the Fuzzy voting and adaptive cutoff
 %
@@ -56,7 +56,7 @@ function outPath = batchAnnotate(inPath, outPath, classLabel, params)
     if ~isdir(outPath)    
         mkdir(outPath);   
     end
-
+    % 'Indices', .
 %% Annotate files by combining score data
     fileList = dir([inPath filesep '*.mat']);
     for k = 1:length(fileList)
@@ -65,9 +65,21 @@ function outPath = batchAnnotate(inPath, outPath, classLabel, params)
             fprintf('Annotating %s ...\n', thisFile);
         end
         load(thisFile);
-        %% Remove the test file from the training data if present
+
+        %% Remove test file  and bad files from the training data if present
         trainFiles = {scoreData.trainFileName};
         trainMask = strcmpi(trainFiles, scoreData(1).testFileName);
+        if ~isempty(params.AnnotateBadTrainFiles)
+            trainNames = cell(size(trainMask));
+            for n = 1:length(trainNames)
+                [~, trainNames{n}] = fileparts(trainFiles{n});
+            end
+            for n = 1:length(params.AnnotateBadTrainFiles)
+                trainMask = trainMask | strcmpi(trainNames, params.AnnotateBadTrainFiles{n});
+            end
+        end
+       
+        %% Annotate and save the data
         annotData = annotate(scoreData(~trainMask), classLabel, params); %#ok<NASGU>
         fileName = [outPath filesep fileList(k).name];
         save(fileName, 'annotData', '-v7.3');

@@ -4,43 +4,17 @@ function annotData = annotate(scoreData, classLabel, params)
 %  Parameters:
 %      scoreData    structure containing scores from individual classifiers
 %      classLabel   string containing class label
-%      
-%  Name-value pair parameters:
+%      params       structure containing parameters
+%  
+%  Parameters relevant to this are:
+%     AnnotateWeights
+%     AnnotateUseAdapativeShift 
+%     AnnotateUseAdaptiveCombine
 %
-%                    'adaptiveCutoff1', true, ...
-%                    'adaptiveCutoff2', true, ...
-%                    'rescaleBeforeCombining', true, ...
-%                    
-%     'weights'     window filter vector with odd number of elements 
-%                   default: [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5]
+%  Written by: Kyung Mu Su and Kay Robbins 2016-2017, UTSA
+%
 %% Set the parameters and reporting for the call   
     params = processAnnotateParameters('annotate', nargin, 2, params);
-%     params = vargin2struct(varargin);  
-%     adaptiveCutoff1 = true;  
-%     if isfield(params, 'adaptiveCutoff1')
-%         adaptiveCutoff1 = params.adaptiveCutoff1;
-%     else
-%         params.adaptiveCutoff1 = adaptiveCutoff1;
-%     end
-%     adaptiveCutoff2 = true;   
-%     if isfield(params, 'adaptiveCutoff2')
-%         adaptiveCutoff2 = params.adaptiveCutoff2;
-%     else
-%         params.adaptiveCutoff2 = adaptiveCutoff2;
-%     end
-%     rescaleBeforeCombining = true;  
-%     if isfield(params, 'rescaleBeforeCombining')
-%         rescaleBeforeCombining = params.rescaleBeforeCombining;
-%     else
-%         params.rescaleBeforeCombining = rescaleBeforeCombining;
-%     end
-
-%     weights = [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5];    
-%     if isfield(params, 'weights')
-%         weights = params.weights;
-%     else
-%         params.weights = weights;
-%     end
     position = floor(length(params.AnnotateWeights)/2) + 1;
      
     %% Initialize the annotation structure
@@ -103,7 +77,3 @@ function annotData = annotate(scoreData, classLabel, params)
     end
     annotData.combinedCutoff = cutoff;
 end
-
-
-
-

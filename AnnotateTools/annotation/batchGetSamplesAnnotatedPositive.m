@@ -1,20 +1,20 @@
 function [] = batchGetSamplesAnnotatedPositive(inPath, outPath, ...
                                    classLabel, params)
 %% Create training sets of positive samples for iterative reranking
+%   
+%   Parameters:
+%      inPath  string containing directory of the classified samples
+%      outPath string containing directory to write positive test files
+%      classLabel  label of the positive class
+%      params   structure containing the parameters for the algorithm
 %
+%   This program reads in an annotData structure and updates 
+%   samples and labels fields. Where labels are the original true labels.
 %   
 %   Written by: Kyung-min Su, UTSA, 2016
 %   Modified by: Kay Robbins, UTSA, 2017
 %
 
-%% Set the options for the paths
-%     params = vargin2struct(varargin); 
-%     
-%     %% Set revised test path if data has been moved
-%     testPathBase = [];
-%     if isfield(params, 'testPathBase')
-%         testPathBase = params.testPathBase;
-%     end
 
     %% Set up the defaults and process the input arguments
     params = processAnnotateParameters('batchGetSamplesAnnotatedPositive', ...
@@ -38,6 +38,7 @@ for k = 1:length(fileList)
         continue;
     end
     
+    %% Handle case where results are in different directory than original
     if ~isempty(testPathBase)
         testFile = [testPathBase filesep testName testExt];
     else

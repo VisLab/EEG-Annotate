@@ -163,8 +163,8 @@ function figh = plotTrueInWings(annotData, outPath, params)
 
     function [bIn, idx] = isInRange2(labels, curIdx, targetID)
     % If a non-targetID value is within timingTolerance count as hit and mark 
-        startIdx = max(1, curIdx - params.subwindowTolerance);
-        endIdx = min(length(labels), curIdx + params.subwindowTolerance);
+        startIdx = max(1, curIdx - params.wingSubwindowTolerance);
+        endIdx = min(length(labels), curIdx + params.wingSubwindowTolerance);
         theIndices = startIdx:endIdx;
         idx = find(labels(theIndices) ~= targetID);
         if ~isempty(idx)
