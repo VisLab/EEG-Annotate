@@ -1,14 +1,14 @@
-# EEG-Annotate
+## EEG-Annotate
 	A tool to identify particular response in unknown continuous EEG signals
 
-# EEG-Annotate is freely available under the GNU General Public License. 
+### EEG-Annotate is freely available under the GNU General Public License. 
 Please cite the following publication if using: 
 > EEG-Annotate: Automated identification and labeling of events 
 > in continuous signals with applications to EEG  
 > Kyung-min Su, W. David Hairston, Kay Robbins
     
 
-# To run example scripts (tested with MATLAB R2015b)
+### To run example scripts (tested with MATLAB R2015b)
 	- add path to EEGLAB (tested with 13.5.4b)
 	- run EEGLAB, if clean_rawdata plugin is not installed, install it (version 0.31)
 	- add path to ESS (to use levelDerivedStudy.m)
@@ -17,7 +17,7 @@ Please cite the following publication if using:
 	- update data paths in an example script
 	- run the example script
 
-# Example scripts (under the examples subdirectory):  
+### Example scripts (under the examples subdirectory):  
 
 	runBatchClassifier.m  runs a specified classifier for specified  
                           classes for all test files in a directory  
@@ -34,11 +34,11 @@ Please cite the following publication if using:
                           performance metrics and bootstraps for statistical  
                           significance.  
 
-# Data preparation:  
+### Data preparation:  
 Before running the annotation pipeline, you must prepare the data to have power features if you are using VEP as training. If you have your own data for training you can prepare both your training and test data using the same features.
 
 
-# References:
+### References:
 	- EEGLAB: https://sccn.ucsd.edu/eeglab/
 	- ESS: http://www.eegstudy.org/
 	- EEG-Clean-Tools: http://vislab.github.io/EEG-Clean-Tools/
@@ -52,15 +52,8 @@ Before running the annotation pipeline, you must prepare the data to have power 
          >K. Su, W. D. Hairston, and K. A. Robbins  
          >15th IEEE International Conference on Machine Learning and Applications, 2016  
 	
-# Support:    
+### Support:    
 	
-    This research was sponsored by the Army Research Laboratory and was 
-    accomplished under Cooperative Agreement Number W911NF-10-2-0022. 
-    The views and conclusions contained in this document are those of 
-    the authors and should not be interpreted as representing the 
-    official policies, either expressed or implied, of the 
-    Army Research Laboratory or the U.S. Government. The U.S. 
-    Government is authorized to reproduce and distribute reprints 
-    for Government purposes notwithstanding any copyright notation herein.
+    This research was sponsored by the Army Research Laboratory and was accomplished under Cooperative Agreement Number W911NF-10-2-0022. The views and conclusions contained in this document are those of the authors and should not be interpreted as representing the official policies, either expressed or implied, of the Army Research Laboratory or the U.S. Government. The U.S. Government is authorized to reproduce and distribute reprints for Government purposes notwithstanding any copyright notation herein.
 
     
