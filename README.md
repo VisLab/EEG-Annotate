@@ -45,13 +45,13 @@ Before running the annotation pipeline, you must prepare the data to have power 
 
 * EEG-Clean-Tools: http://vislab.github.io/EEG-Clean-Tools/  
 
-*ARRLS:  
+* ARRLS:  
 > Adaptation regularization: A general framework for transfer learning  
 > M. Long, J. Wang, G. Ding, S. J. Pan, and P. S. Yu  
 > IEEE Trans. Knowl. Data Eng., vol. 26, no. 5, pp. 1076-1089, May 2014  
   
 * ARRLSimb:  
-> Adaptive thresholding and reweighting to improve domain transfer learning for unbalanced data: With applications to EEG imbalance  
+> Adaptive thresholding and reweighting to improve domain transfer learning for unbalanced data: With applications to EEG imbalance   
 > K. Su, W. D. Hairston, and K. A. Robbins  
 > 15th IEEE International Conference on Machine Learning and Applications, 2016  
 	
