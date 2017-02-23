@@ -35,18 +35,22 @@ Please cite the following publication if using:
                           significance.  
 
 # Data preparation:  
-Before running the annotation pipeline, you must prepare the data to have
-power features if you are using VEP as training. If you have your own data  
-for training you can prepare both your training and test data using the  
-same features.
+Before running the annotation pipeline, you must prepare the data to have power features if you are using VEP as training. If you have your own data for training you can prepare both your training and test data using the same features.
 
 
 # References:
 	- EEGLAB: https://sccn.ucsd.edu/eeglab/
 	- ESS: http://www.eegstudy.org/
 	- EEG-Clean-Tools: http://vislab.github.io/EEG-Clean-Tools/
-	- ARRLS: M. Long, J. Wang, G. Ding, S. J. Pan, and P. S. Yu, Adaptation regularization: A general framework for transfer learning,â€? IEEE Trans. Knowl. Data Eng., vol. 26, no. 5, pp. 1076â€“1089, May 2014
-	- ARRLSimb: K. Su, W. D. Hairston, and K. A. Robbins, Adaptive thresholding and reweighting to improve domain transfer learning for unbalanced data With applications to EEG imbalance,â€? in 15th IEEE International Conference on Machine Learning and Applications, 2016
+	- ARRLS:  
+         >Adaptation regularization: A general framework for transfer learning  
+         >M. Long, J. Wang, G. Ding, S. J. Pan, and P. S. Yu  
+         >IEEE Trans. Knowl. Data Eng., vol. 26, no. 5, pp. 1076-1089, May 2014  
+	- ARRLSimb:  
+         >Adaptive thresholding and reweighting to improve domain transfer  
+         >learning for unbalanced data: With applications to EEG imbalance  
+         >K. Su, W. D. Hairston, and K. A. Robbins  
+         >15th IEEE International Conference on Machine Learning and Applications, 2016  
 	
 # Support:    
 	
