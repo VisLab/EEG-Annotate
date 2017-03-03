@@ -10,7 +10,7 @@ classes = {'34', '35'};
 theColors = [0.45, 0.45, 0.45; 0.65, 0.65, 0.65; 0.85, 0.85, 0.85];
 
 subjectsGood = [2, 4, 5, 8, 9, 11, 18]';
-subjectsMedium = [1, 3, 7, 10, 10, 15, 16]';
+subjectsMedium = [1, 3, 7, 10, 10, 13, 15, 16]';
 subjectsPoor = [6, 12, 14, 17]';
 
 %% Load the file

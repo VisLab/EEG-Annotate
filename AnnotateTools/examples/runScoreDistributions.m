@@ -2,16 +2,11 @@
 inDir = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_ARRLSimb_Annotation';
 outDir = 'D:\Papers\Current\Annotation\Resubmission\figures\cutoffPlots\Resized';
 classes = {'34', '35'};
-%outDir = [];
-subjectsGood = [2, 4, 5, 8, 9, 11, 18]';
-subjectsMedium = [1, 3, 7, 10, 10, 15, 16]';
-subjectsPoor = [6, 12, 14, 17]';
 
-%% Load the file
-
+%% Show the score distributions for a given set of annotation files.
 for n = 1:length(classes)
     annotPaths = getFiles('FILES', [inDir '_' classes{n}], '.mat');
-    for k = [1, 9, 14]%1:length(annotPaths)
+    for k = 1:length(annotPaths)
         [~, theName, ~] = fileparts(annotPaths{k});
         thisOne = load(annotPaths{k});
         scores = thisOne.annotData.wmScores;
@@ -57,6 +52,6 @@ for n = 1:length(classes)
             saveas(figh, [fileName '.pdf'], 'pdf');
             saveas(figh, [fileName '.png'], 'png');
         end
-        %close all;
+        close all;
     end
 end

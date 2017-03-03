@@ -1,14 +1,8 @@
 function defaults = getAnnotateDefaults()
-% Returns the defaults for a given step in annotation
+% Returns the defaults for annotation
 %
 % Parameters:
-%     signal       a structure compatible with EEGLAB EEG structure
-%                   (must have .data and .srate fields
-%     type         a string indicating type of defaults to return:
-%                  boundary, resample, detrend, globaltrend, linenoise
-%                  reference
 %
-% Output:
 %     defaults     a structure with the parameters for the default types
 %                  in the form of a structure that has fields
 %                     value: default value
