@@ -1,5 +1,7 @@
 %% This script annotates a data collection that has been classified 
-
+%
+% The results are written as annotData structures to files
+%
 %% Set the directories for input and output as well as the other parameters
 inPathBase = 'D:\Research\Annotate\Kay\Data2\VEP_PREP_ICA_VEP2_MARA_averagePower';
 outPathBase = 'D:\Research\Annotate\Kay\Data2\VEP_PREP_ICA_VEP2_MARA_averagePower';

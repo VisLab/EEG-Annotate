@@ -3,29 +3,17 @@
 % outPath = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_LDA_Annotation_34_Wings';
 
 %% Path for ARRLS modified 
-% inPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_ARRLSMod_Annotation';
-% outPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_ARRLSMod_Annotation_Wings';
-% targetClasses = {'34', '35'};
-% classifierName = 'ARRLSMod';
 
-%% Path for ARRLS imbalanced
-% inPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_ARRLSimb_Annotation';
-% outPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_ARRLSimb_Annotation_Wings';
-% targetClasses = {'34', '35'};
-% classifierName = 'ARRLSimb';
-
-%% Path for ARRLS 
-inPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower';
-outPathBase = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower';
-inType = '_reranked_ARRLSMod_';
-outType = '_reranked_ARRLSMod__WingsBigA_';
-% inType = '_Annotation_';
-% outType = '_Annotation_Wings_';
+%% Set up the directories and parameters
+inPathBase = 'D:\Research\Annotate\Kay\Data2\VEP_PREP_ICA_VEP2_MARA_averagePower';
+outPathBase = 'D:\Research\Annotate\Kay\Data2\VEP_PREP_ICA_VEP2_MARA_averagePower';
+inType = '_Annotation_';
+outType = '_Annotation_Wings_';
 targetClasses = {'34', '35'};
-%targetClassifiers = {'LDA', 'ARRLS', 'ARRLSMod', 'ARRLSimb'};
-targetClassifiers = {'ARRLSimb'};
+targetClassifiers = {'LDA', 'ARRLS', 'ARRLSMod', 'ARRLSimb'};
 params = struct();
 params.wingPlotSize = 65;
+
 %% Process and plot the variables
 for m = 1:length(targetClassifiers)
     for n = 1:length(targetClasses)

@@ -42,7 +42,7 @@ function [samples, labels, indices] = getTrainingData(data, targetClass)
     pickIdx(pickIdx > size(data.samples, 2)) = [];
     nonTargetSample = data.samples;
     nonTargetSample(:, pickIdx) = [];
-    nonTargetIndices = dataIndices(pickIdx);
+    nonTargetIndices = dataIndices(~pickIdx);
     samples = [nonTargetSample targetSample ];
     if size(nonTargetSample, 2) == 0 
         warning('Data has no non-target samples');
