@@ -1,19 +1,18 @@
 function scoreData = classifyARRLSimb(dataTest, dataTrain, ...
                                        targetClass, params)
-%% Classify test data using the ARRLSimb classifier
-%
+%% Use the ARRLS imbalanced classifier to classify targetClass for dataTrain.
+%  
 %  Parameters:
-%     dataPathTest   full path name test data
-%          samples   an array with feature vectors in the columns
-%          labels    cell array of labels corresponding to feature vectors
-%                    if unlabeled the cell is empty
-%     dataPathTrain  full path name of training data (same format as training)
-%     targetClass    string containing target class
-%     varargin       name-value pair parameters  (KYUNG PLEASE DOCUMENT)
+%    dataTest         structure with sample and label fields for testing 
+%    dataTrain        structure with sample and label fields for training
+%    targetClass      string containing the target class (one vs all)
+%    params           structure containing parameters to override defaults
+%    scoreData        (output) structure containing the scoreData structure
 %
-%     scoreData
+% See also getScoreDataStructure
 %
-% 
+%  Written by: Kyung Mu Su and Kay Robbins 2016-2017, UTSA
+%
 %% Set the parameters and reporting for the call   
     params = processAnnotateParameters('classifyARRLSimb', nargin, 3, params);
     

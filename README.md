@@ -37,6 +37,12 @@ Please cite the following publication if using:
 ### Data preparation:  
 Before running the annotation pipeline, you must prepare the data to have power features if you are using VEP as training. If you have your own data for training you can prepare both your training and test data using the same features.
 
+### Releases: 
+ 
+Version 1.0.1 Released 08/31/2017
+* Added getAnnotateVersion
+* Added powerFeatures aned batchPowerFeatures for consistent process
+* Cleaned up some of the header documentation
 
 ### References:
 * EEGLAB: https://sccn.ucsd.edu/eeglab/  

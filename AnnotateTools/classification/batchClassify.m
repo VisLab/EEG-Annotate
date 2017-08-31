@@ -1,11 +1,24 @@
-
-function outputFileNames = batchClassify(testPaths, trainPaths, ...
+function outFiles = batchClassify(testPaths, trainPaths, ...
                           outPath, targetClass, targetClassifier, params)
-%% Estimate classification scores of samples using the ARRLS classifier
+%% Perform a batch classification class for lists of training and test data.
 %  
 %  Parameters:
-%       inPat: the pash to the data (samples and classes)
-%       outPath: the path to the place where estimated scores are saved
+%    testPaths        cell array of full path names to test files
+%    trainPaths       cell array of full path names to train files
+%    outPath          base path name for saving results
+%    targetClass      string containing the target class (one vs all)
+%    targetClassifier string giving name of classifier
+%                     ('lda', 'arrls', 'arrlsimb', 'arrlsmod')
+%    params           structure containing parameters to override defaults
+%    outFiles         (output) cell array of paths to output results
+%
+%  The input files contain feature vectors in columns of an array called
+%  samples as well as a cell array of labels.
+%
+%  The output files consist of a scoreData structure containing all of the
+%  classification results for a single test file.
+%
+%  Written by: Kyung Mu Su and Kay Robbins 2016-2017, UTSA
 %
     %% Set up the defaults and process the input arguments
     params = processAnnotateParameters('batchClassify', nargin, 5, params);
@@ -18,7 +31,7 @@ function outputFileNames = batchClassify(testPaths, trainPaths, ...
     %% Process the training-test set pairs using the LDA classifier
     numTests = length(testPaths);
     numTrain = length(trainPaths);
-    outputFileNames = cell(numTests, 1);
+    outFiles = cell(numTests, 1);
     for k = 1:numTests
         if params.verbose
             fprintf('%s class:%s test set: %s\n', targetClassifier, ...
@@ -54,8 +67,8 @@ function outputFileNames = batchClassify(testPaths, trainPaths, ...
             scoreData(i).testFileName = testPaths{k};
             scoreData(i).trainFileName = trainPaths{i};
         end
-        outputFileNames{k} = [outPath filesep testName '_' targetClass];
-        save(outputFileNames{k}, 'scoreData', '-v7.3');
+        outFiles{k} = [outPath filesep testName '_' targetClass];
+        save(outFiles{k}, 'scoreData', '-v7.3');
     end
 end
             
