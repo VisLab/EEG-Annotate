@@ -6,8 +6,14 @@ function [currentVersion, changeLog, markdown] = getAnnotateVersion()
 end
 
 function changeLog = getChangeLog()
-   changeLog(1) = ...
+   changeLog(2) = ...
      struct('version', '0', 'status', 'Released', 'date', '', 'changes', '');
+
+    changeLog(2).version = '1.0.2';
+    changeLog(2).status = 'Released';
+    changeLog(2).date = '09/19/2017';
+    changeLog(2).changes = { ...
+       'Fixed ARRLS to have correct parameter settings'};
 
     changeLog(1).version = '1.0.1';
     changeLog(1).status = 'Released';

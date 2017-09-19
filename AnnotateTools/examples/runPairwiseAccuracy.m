@@ -3,11 +3,13 @@
 %
 %% Set up the directories, colors and shapes colors
 inBase = 'D:\Research\Annotate\Kay\Data2\VEP_PREP_ICA_VEP2_MARA_averagePower';
-outDir = 'D:\Papers\Current\Annotation\Resubmission\figures\pairwiseAccuracy';
+outDir = 'D:\Papers\Current\Annotation\Resubmission\figures\pairwiseAccuracyTemp';
 targetClasses = {'34', '35'};
 targetClassNames = {'Friend', 'Foe'};
-baseClassifier = 'ARRLSMod';
-otherClassifiers = {'ARRLSimb', 'LDA'};
+%baseClassifier = 'ARRLS';
+baseClassifier = 'LDA';
+%otherClassifiers = {'ARRLSimb', 'LDA'};
+otherClassifiers = {'ARRLSimb'};
 otherShapes = {'o', 's'};
 otherColors = [0, 0, 0; 0.75, 0.75, 0.75];
 plotRange = [0, 1];
