@@ -8,11 +8,9 @@ Please cite the following publication if using:
 > Kyung-min Su, W. David Hairston, Kay Robbins
     
 
-### To run example scripts (tested with MATLAB R2015b)
-	- add path to EEGLAB (tested with 13.5.4b)
+### To run example scripts (should work with MATLAB versions 2014a+)
+	- add path to EEGLAB (should work with versions 13.5.4b+)
 	- run EEGLAB, if clean_rawdata plugin is not installed, install it (version 0.31)
-	- add path to ESS (to use levelDerivedStudy.m)
-	- add path to EEG-Clean-Tools\PrepPipeline\utilities (to use vargin2struct.m)
 	- add path to this AnnotateTools with Subfolders
 	- update data paths in an example script
 	- run the example script
@@ -38,6 +36,9 @@ Please cite the following publication if using:
 Before running the annotation pipeline, you must prepare the data to have power features if you are using VEP as training. If you have your own data for training you can prepare both your training and test data using the same features.
 
 ### Releases: 
+Version 1.0.3 Released 10/03/2017
+* Added non-parametric bootstrap test for statistical significance
+* Began verifying package works for versions later than 2014a
 
 Version 1.0.2 Released 09/19/2017
 * Fixed ARRLS to have correct parameter settings  

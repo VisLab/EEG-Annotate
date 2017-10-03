@@ -1,8 +1,7 @@
 %% This script shows how to plot metrics and significance
-inDir = 'D:\Research\Annotate\Kay\Data\VEP_PREP_ICA_VEP2_MARA_averagePower_ARRLSimb_Annotation_Reports';
+inDir = 'D:\Research\Annotate\Kay\Data2\VEP_PREP_ICA_VEP2_MARA_averagePower_ARRLSimb_Annotation_Reports';
 inFile = 'precisionRecallStats.mat';
-%outDir = 'D:\Papers\Current\Annotation\Resubmission\figures\performancePlots\Original';
-outDir = [];
+outDir = 'D:\Papers\Current\Annotation\Resubmission\figures\performancePlots\OriginalNew';
 tols2Plot = 3;
 metricNames = {'precision', 'precisionAll', 'recall', 'recallAll', ...
                 'averagePrecision', 'averagePrecisionAll'};
@@ -12,7 +11,7 @@ theColors = [0.45, 0.45, 0.45; 0.65, 0.65, 0.65; 0.85, 0.85, 0.85];
 subjectsGood = [2, 4, 5, 8, 9, 11, 18]';
 subjectsMedium = [1, 3, 7, 10, 10, 13, 15, 16]';
 subjectsPoor = [6, 12, 14, 17]';
-
+alpha = 0.05;  % Significance level
 %% Load the file
 
 for n = 1:length(classes)
@@ -34,6 +33,7 @@ for n = 1:length(classes)
             saveas(figh, [baseName '.fig'], 'fig');
             saveas(figh, [baseName '.png'], 'png');
             saveas(figh, [baseName '.pdf'], 'pdf');
+            saveas(figh, [baseName '.eps'], 'epsc');
         end
         summary = zeros(4, numTolerances);
         summary(4, :) = mean(metric);
@@ -41,10 +41,21 @@ for n = 1:length(classes)
         summary(2, :) = mean(metric(subjectsMedium, :));
         summary(3, :) = mean(metric(subjectsPoor, :));
         fprintf('\nClass %s: metric %s\n', classes{n},metricNames{k});
+        fprintf('Tol\tGood\tMedium\tPoor\tAll\n');
         for m = 1:numTolerances
             fprintf('%d:\t%7.3f\t%7.3f\t%7.3f\t%7.3f\n', tolerances(m), ...
                 summary(1, m), summary(2, m), summary(3, m), summary(4, m));
         end
-  
+        fprintf('\nNot significant at %g level\n', alpha);
+        for m = 1:numTolerances
+            results = stats{m};
+            for s = 1:length(results);
+               r = results(s);
+               pValue = getEmpiricalSignificance(r.value, r.eData, r.eProb);
+               if pValue > alpha
+                   fprintf('Tol=%d, Subject=%d, pValue = %g\n', m, s, pValue);
+               end
+            end
+        end
     end
 end

@@ -126,9 +126,12 @@ function stats = getStats(bootstrap, actualValue)
     stats.p = p;
     stats.ci = ci;
     stats.zval = zval;
+    [f, x] = ecdf(bootstrap(:));
+    stats.eProb = f;
+    stats.eData = x;
 end
 
 function statStruct = getStatStructure()
     statStruct = struct('value', NaN, 'mean', NaN, 'std', NaN', 'p', NaN, ...
-        'zval', NaN', 'ci', NaN);
+        'zval', NaN', 'ci', NaN, 'eProb', NaN, 'eData', NaN);
 end

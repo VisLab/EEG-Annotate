@@ -6,9 +6,16 @@ function [currentVersion, changeLog, markdown] = getAnnotateVersion()
 end
 
 function changeLog = getChangeLog()
-   changeLog(2) = ...
+    changeLog(3) = ...
      struct('version', '0', 'status', 'Released', 'date', '', 'changes', '');
 
+    changeLog(3).version = '1.0.3';
+    changeLog(3).status = 'Released';
+    changeLog(3).date = '10/03/2017';
+    changeLog(3).changes = { ...
+       'Added non-parametric bootstrap test for statistical significance';
+       'Began verifying package works for versions later than 2014a'};
+ 
     changeLog(2).version = '1.0.2';
     changeLog(2).status = 'Released';
     changeLog(2).date = '09/19/2017';
