@@ -1,30 +1,29 @@
-
-function [features, featureLabels, params] = powerFeatures(EEG, params)
-%% Extract power features and labels from an EEG structure.
+function [features, featureLabels, params] = covarianceFeatures(EEG, params)
+%% Extract covariance features and labels from an EEG structure.
 %
 %  Parameters:
 %   EEG     EEGLAB data structure
 %   
 %   params  (Input/output) structure with any of the following fields set:
-%     featurePowerSubbands  
+%     powerFeatureSubbands  
 %           B x 2 array of B frequency bands for features.
 %           Default: [0 4; 4 8; 8 12; 12 16; 16 20; 20 24; 24 28; 28 32]
-%     featureWindowLength  
+%     powerFeatureWindowLength  
 %           Window length in seconds.
 %           Default: 1 
-%     featureSubWindowLength 
+%     powerFeatureSubWindowLength 
 %           Subwindow length in seconds.
 %           Default:  0.125
-%     featureWindowStep 
+%     powerFeatureWindowStep 
 %           Window slide length in seconds (multiple of subwindow size).
 %           Default:  0.125
-%     featureExcludedChannels 
+%     powerFeatureExcludedChannels 
 %           Cell array of channel labels to explicitly exclude.
 %           Default: {}
-%     featureExcludeNonEEGChannels 
+%     powerFeatureExcludeNonEEGChannels 
 %           If true exclude channels whose type is not 'EEG' 
 %           Default: true
-%     featureExcludeNonLocatedChannels 
+%     powerFeatureExcludeNonLocatedChannels 
 %           If true exclude channels that do not have channel locations.
 %           Default: true
 %  
@@ -34,7 +33,7 @@ function [features, featureLabels, params] = powerFeatures(EEG, params)
 %  Written by: Kyung Mu Su and Kay Robbins 2016-2017, UTSA
 %
 %% Get the parameters
-    params = processAnnotateParameters('powerFeatures', nargin, 1, params);
+    params = processAnnotateParameters('covarianceFeatures', nargin, 1, params);
     
     %% Eliminate exclude channels
     chanlocs = EEG.chanlocs;
@@ -62,48 +61,28 @@ function [features, featureLabels, params] = powerFeatures(EEG, params)
 end
 
 function [features, labels] = getFeatures(EEGin, config)
-
-    dataLength = size(EEGin.data, 2); 
     sRate = EEGin.srate;   
-    subLengthFrame = round(sRate*config.featureSubWindowLength); 
-    stepFrame = round(sRate*config.featureWindowStep);           
-    featureSubj = [];
-    pBands = config.featurePowerSubbands;
-    for m = 1:size(pBands, 1) % for each sub-band      
-        subEEG = pop_eegfiltnew(EEGin, pBands(m, 1), pBands(m, 2));  
-        data = zscore(subEEG.data, 0, 2);
-        data = data .^ 2;   % power data = amplitude ^ 2
-        
-        featureBand = [];
-        windBegin = 1;
-        windEnd = windBegin + subLengthFrame - 1;
-        while windEnd <= dataLength     % update to include the last frame
-            windFeature = mean(data(:, windBegin:windEnd), 2); % [64x1]
-            featureBand = cat(2, featureBand, windFeature);
-            windBegin = windBegin + stepFrame;
-            windEnd = windBegin + subLengthFrame - 1;
-        end
-        featureSubj = cat(1, featureSubj, featureBand);
-    end    
-    
-    subWindowNumb = round(config.featureWindowLength / config.featureSubWindowLength);
-    features = repmat(featureSubj, subWindowNumb, 1);
-
-    dimension = size(featureSubj, 1);			% average Power for biosemi 64 channels, 8 sub-bands, 8 sub-windwos ==> (512)
-    for b= 2:size(config.featurePowerSubbands, 1)
-        bandBegin = (b-1)*dimension+1;
-        bandEnd = b*dimension;
-        copyOffset = b-1;
-        features(bandBegin:bandEnd, 1:end-copyOffset) = ...
-                              features(bandBegin:bandEnd, 1+copyOffset:end);
+    [numChans, numFrames] = size(EEGin.data); 
+    stepFrames = round(sRate*config.featureWindowStep);
+    windowFrames = round(sRate*config.featureWindowLength);
+    numFeatures = floor((numFrames - windowFrames)/stepFrames) + 1;
+    features = zeros(numChans, numChans, numFeatures);
+    windBegin = 1;
+    windEnd = windBegin + windowFrames - 1;
+    for k = 1:numFeatures
+        data = EEGin.data(:, windBegin:windEnd);
+        features(:, :, k) = data*data';
+        windBegin = windBegin + stepFrames;
+        windEnd = windBegin + windowFrames - 1;
     end
+    features = features./(numChans - 1);
     
     eventLabelString = getEventLabelInString(EEGin.event);       
     
     eventLatencySecond = [EEGin.event.latency]' ./ sRate;            
     eventIndex = floor(eventLatencySecond ./ config.featureWindowStep) + 1;          
     
-    labels = cell(1, size(features, 2));   
+    labels = cell(1, numFeatures);   
     for i = 1:length(eventLabelString)
         if eventIndex(i) < length(labels)  
             if isempty(labels{eventIndex(i)})
@@ -113,8 +92,6 @@ function [features, labels] = getFeatures(EEGin, config)
             end
         end
     end  
-    features = features(:, 1:end-8);
-    labels = labels(1:end-8)';
 end
 
 function label = getEventLabelInString(event)

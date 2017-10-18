@@ -6,7 +6,7 @@
 % outBasePath = 'D:\TestData\AnnotateData\VEP_PREP_ICA_VEP2_MARA_averagePower';
 % params = struct();
 inDir = 'D:\TestData\AnnotateData\VEP_PREP_ICA_VEP2_LARG';
-outBasePath = 'D:\TestData\AnnotateData\VEP_PREP_ICA_VEP2_LARG_averagePower';
+outBasePath = 'D:\TestData\AnnotateData\VEP_PREP_ICA_VEP2_LARG_averagePowerTemp';
 params = struct();
 
 %% Make sure that the output base directory exists

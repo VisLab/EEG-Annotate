@@ -35,7 +35,11 @@ Please cite the following publication if using:
 ### Data preparation:  
 Before running the annotation pipeline, you must prepare the data to have power features if you are using VEP as training. If you have your own data for training you can prepare both your training and test data using the same features.
 
-### Releases: 
+### Releases:  
+Version 1.0.4 Released 10/18/2017
+* Revised the parameter names for computing power features
+* Added covariance features  
+  
 Version 1.0.3 Released 10/03/2017
 * Added non-parametric bootstrap test for statistical significance
 * Began verifying package works for versions later than 2014a

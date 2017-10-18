@@ -6,8 +6,15 @@ function [currentVersion, changeLog, markdown] = getAnnotateVersion()
 end
 
 function changeLog = getChangeLog()
-    changeLog(3) = ...
+    changeLog(4) = ...
      struct('version', '0', 'status', 'Released', 'date', '', 'changes', '');
+
+    changeLog(4).version = '1.0.4';
+    changeLog(4).status = 'Released';
+    changeLog(4).date = '10/18/2017';
+    changeLog(4).changes = { ...
+       'Revised the parameter names for computing power features';
+       'Added covariance features'};
 
     changeLog(3).version = '1.0.3';
     changeLog(3).status = 'Released';

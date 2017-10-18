@@ -1,5 +1,5 @@
-function outputFileNames = batchPowerFeatures(inPaths, outPathBase, params)
-%% Perform power feature extraction on a list of files.
+function outputFileNames = batchCovarianceFeatures(inPaths, outPathBase, params)
+%% Perform covariance feature extraction on a list of files.
 %  
 %  Parameters:
 %    inPaths          cell array of path names for EEG files to extract features
@@ -12,24 +12,24 @@ function outputFileNames = batchPowerFeatures(inPaths, outPathBase, params)
 %  Written by: Kyung Mu Su and Kay Robbins 2016-2017, UTSA
 %
     %% Set up the defaults and process the input arguments
-    params = processAnnotateParameters('batchPowerFeatures', nargin, 2, params);
+    params = processAnnotateParameters('batchCovarianceFeatures', nargin, 2, params);
 
     %% Make sure that the outPathBase exists, if not make the directory
     if ~exist(outPathBase, 'dir')
       mkdir(outPathBase);
     end
     
-    %% Process datasets to compute power features
+    %% Create covariance features
     numDatasets = length(inPaths);
     outputFileNames = cell(numDatasets, 1);
     for k = 1:numDatasets
         if params.verbose
-            fprintf('Creating power features for %s \n', inPaths{k});
+            fprintf('Creating covariance features for %s \n', inPaths{k});
         end
        
         EEG = pop_loadset(inPaths{k});
         [~, theName, ~] = fileparts(inPaths{k});
-        [samples, labels] = powerFeatures(EEG, params); %#ok<ASGLU>
+        [samples, labels] = covarianceFeatures(EEG, params); %#ok<ASGLU>
         save([outPathBase filesep theName '.mat'], 'samples', 'labels', '-v7.3');
     end
 end
