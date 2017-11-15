@@ -3,14 +3,16 @@ function [sampleIndex, timeTolerance, nearestMatch, nearestClass] = ...
 %% Compute the distance to the nearest subwindow containing classLabel
 %
 %  Parameters:
-%      labels        cell array of labels
+%      labels       cell array of labels
 %      classLabel   label to determine closeness to
 %      sampleMask   mask giving all the samples to be considered
 %
 %  Output:
 %      sampleIndex     index of this event in original labels
 %      timeTolerance   distance of this event to nearest classLabel
-%      nearestClasses  index of nearest classLabel event.
+%      nearestMatch    
+%      nearestClasses  index of nearest classLabel event
+%
 % Return the closest event of classLabel in labels
 
 %% Initialize the data structures

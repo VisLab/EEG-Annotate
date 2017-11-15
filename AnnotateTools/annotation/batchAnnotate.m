@@ -14,7 +14,7 @@ function outPath = batchAnnotate(inPath, outPath, classLabel, params)
 %                    'weights', [0.5 0.5 0.5 0.5 0.5 1 3 8 3 1 0.5 0.5 0.5 0.5 0.5]);
 %
 %   Inputs:
-%       inPath: the pash to the classification scores
+%       inPath: the path to the classification scores
 %   
 %   Optional inputs:
 %       'outPath': the path to the place where estimated annotation scores will be saved. (default: '.\temp')

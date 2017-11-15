@@ -1,5 +1,5 @@
 function [classMask, classIndex] = getClassMask(labels, classLabel)
-% Extracts a class mask and the class index of the specified classLabel
+%% Extracts a class mask and the class index of the specified classLabel
 %
 %  Parameters:
 %     labels   cell array containing single labels or cell arrays of labels

@@ -6,7 +6,19 @@ Please cite the following publication if using:
 > EEG-Annotate: Automated identification and labeling of events 
 > in continuous signals with applications to EEG  
 > Kyung-min Su, W. David Hairston, Kay Robbins
-    
+> Journal of Neuroscience Methods Volume 293(1), Jan 2018, Pages 359-374.
+> http://www.sciencedirect.com/science/article/pii/S0165027017303655
+
+### The data used to test EEG-Annotate is described in the data note:  
+> An 18-subject EEG data collection using a visual-oddball task, 
+> designed for benchmarking algorithms and headset performance comparisons
+> Kay Robbins, Kyung-min Su, W. David Hairston
+> Data-in-Brief
+> http://www.sciencedirect.com/science/article/pii/S2352340917306285
+
+### The actual data is available in three formats in NITRC    
+> Visually Evoked Potential EEG
+> https://www.nitrc.org/projects/vep_eeg_raw  
 
 ### To run example scripts (should work with MATLAB versions 2014a+)
 	- add path to EEGLAB (should work with versions 13.5.4b+)
@@ -36,6 +48,12 @@ Please cite the following publication if using:
 Before running the annotation pipeline, you must prepare the data to have power features if you are using VEP as training. If you have your own data for training you can prepare both your training and test data using the same features.
 
 ### Releases:  
+Version 1.0.5 Released 11/15/2017
+* Added publication information to README
+* Added additional documentation to various functions
+* Added getSampleTiming in preparation for report refactor
+* Added reportComparison to compare two different annotations  
+    
 Version 1.0.4 Released 10/18/2017
 * Revised the parameter names for computing power features
 * Added covariance features  

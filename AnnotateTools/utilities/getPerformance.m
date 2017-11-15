@@ -1,5 +1,11 @@
 function [totalPositives, totalRetrieved, precision, recall, averagePrecision] = ...
                       getPerformance(labels, scores, targetClasses, tolerances, sampleMask) 
+%% Get the performance measures from annotation data
+%
+%  Parameters:
+%      labels
+
+%%
     numClasses = length(targetClasses);
     numTolerances = length(tolerances);
     positives = zeros(numClasses, 1);

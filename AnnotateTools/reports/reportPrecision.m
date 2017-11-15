@@ -1,12 +1,18 @@
 function outPath = reportPrecision(inPath, outPath, targetClasses, ...
                                    targetNum, params)
-%% Generate reports using the precision metric
+%% Generate reports using the precision metric for targetNum and for all
 %
 %  Parameters:
-%       inPat: the pash to the annotation scores
-%       outPath: the path to the place where the generated report is saved
+%       inPath:         base path to the annotation scores
+%       outPath:        base directory for saving reports
+%       targetClasses:  cell array with all of the relevant target names
+%       targetNum       position in targetClasses of desired target class
+%       params          parameters use (reportTimingTolerances)
 %
-
+% This report generator calculates precision for different timing tolerances
+%
+% Written by: Kay Robbins, UTSA
+%
 %% Set up the defaults and process the input arguments
 params = processAnnotateParameters('reportPrecision', nargin, 4, params);
 tolerances = params.reportTimingTolerances;
