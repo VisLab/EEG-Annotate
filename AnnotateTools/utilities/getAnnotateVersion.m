@@ -6,9 +6,15 @@ function [currentVersion, changeLog, markdown] = getAnnotateVersion()
 end
 
 function changeLog = getChangeLog()
-    changeLog(5) = ...
+    changeLog(6) = ...
      struct('version', '0', 'status', 'Released', 'date', '', 'changes', '');
 
+    changeLog(6).version = '1.0.6';
+    changeLog(6).status = 'Released';
+    changeLog(6).date = '11/27/2017';
+    changeLog(6).changes = { ...
+       'Modified the batch comparison naming'};
+   
     changeLog(5).version = '1.0.5';
     changeLog(5).status = 'Released';
     changeLog(5).date = '11/15/2017';

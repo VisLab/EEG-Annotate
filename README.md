@@ -48,6 +48,9 @@ Please cite the following publication if using:
 Before running the annotation pipeline, you must prepare the data to have power features if you are using VEP as training. If you have your own data for training you can prepare both your training and test data using the same features.
 
 ### Releases:  
+Version 1.0.6 Released 11/27/2017
+* Modified the batch comparison naming
+    
 Version 1.0.5 Released 11/15/2017
 * Added publication information to README
 * Added additional documentation to various functions

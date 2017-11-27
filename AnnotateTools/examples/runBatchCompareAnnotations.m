@@ -7,14 +7,17 @@ inPathBase1 = 'D:\Research\Annotate\Kay\Data2\VEP_PREP_ICA_VEP2_MARA_averagePowe
 inPathBase2 = 'D:\Research\Annotate\Kay\Data2\VEP_PREP_ICA_VEP2_MARA_averagePower';
 outPathBase = 'D:\Research\Annotate\Kay\Data2\VEP_Reports';
 targetClass = '34';
-targetClassifier = 'ARRLSimb';
+targetClassifier1 = 'ARRLSimb';
+targetClassifier2 = 'ARRLSimb';
 params = struct();
-outType = 'VEP_MARAverPowARRLSimb_Vs_MARAAverPowARRLSimb_';
+outBase1 = 'VEP_MARAAverPow';
+outBase2 = 'VEP_MARAAverPow';
+outType = [outBase1 targetClassifer1 '_Vs_' outBase2 targetClassifer2];
 tolerances = [0, 1, 2, 3];
 
 %% Perform the annotation
-inPath1 = [inPathBase1 '_' targetClassifier '_Annotation_' targetClass];
-inPath2 = [inPathBase2 '_' targetClassifier '_Annotation_' targetClass];
+inPath1 = [inPathBase1 '_' targetClassifier1 '_Annotation_' targetClass];
+inPath2 = [inPathBase2 '_' targetClassifier2 '_Annotation_' targetClass];
 if ~exist(outPathBase, 'dir')
     mkdir(outPathBase);
 end
