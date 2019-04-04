@@ -8,8 +8,11 @@
 % inDir = 'D:\TestData\AnnotateData\VEP_PREP_ICA_VEP2_MARA';
 % outBasePath = 'D:\TestData\AnnotateData\VEP_PREP_ICA_VEP2_MARA_REMAPPED';
 
-inDir = 'D:\TestData\AnnotateData\VEP_RAW';
-outBasePath = 'D:\TestData\AnnotateData\VEP_RAW_REMAPPED';
+% inDir = 'D:\TestData\AnnotateData\VEP_RAW';
+% outBasePath = 'D:\TestData\AnnotateData\VEP_RAW_REMAPPED';
+
+inDir = 'O:\LARGData\SpeedControl\run_12\ARL_SpeedControl';
+outBasePath = 'E:\AnnotateData\ARL_SpeedControl_LARG_Remapped';
 
 commonChannelFile = 'D:\Research\Annotate\EEG-Annotate\AnnotateTools\preprocessing\baseChannelLocs.mat';
 test = load(commonChannelFile);
@@ -21,7 +24,12 @@ if ~exist(outBasePath, 'dir')
 end
 
 %% Get the input files 
-inPaths = getFiles('FILES', inDir, '.set');
-
+inPaths = getFiles('FILES2', inDir, '.set');
+outPaths = cell(length(inPaths), 1);
+for k = 1:length(inPaths)
+    [thePath, theName, theExt] = fileparts(inPaths{k});
+    sepInds = strfind(thePath, filesep);
+    outPaths{k} = [outBasePath filesep thePath(sepInds(end) + 1:end) '_' theName theExt];
+end
 %% Compute the features
-outputFileNames = batchMapToCommonChannels(inPaths, outBasePath, baselocs);
+batchMapToCommonChannels(inPaths, outPaths, baselocs);
